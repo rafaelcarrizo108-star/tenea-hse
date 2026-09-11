@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TENEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --teal:#2E7A94; --teal-soft:#DCEEF3; --teal-ink:#FFFFFF;
+    --shadow-sm: 0 1px 2px rgba(25,20,10,.06);
+    --shadow-md: 0 18px 40px -26px rgba(25,20,10,.35);
+    --shadow-lg: 0 30px 70px -30px rgba(25,20,10,.4);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+      --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+      --line:#26313F; --line-strong:#34415A;
+      --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+      --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+    --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+    --line:#26313F; --line-strong:#34415A;
+    --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+    --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  img,svg{max-width:100%;display:block;}
+  a{color:inherit;}
+  ::selection{background:var(--accent);color:var(--accent-ink);}
+  h1,h2,h3{font-family:"Big Shoulders Display",ui-sans-serif,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:.94;}
+  .mono{font-family:"Space Mono",ui-monospace,monospace;}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 clamp(18px,4vw,40px);}
+  section{padding:clamp(52px,8vw,100px) 0;}
+  p{max-width:60ch;color:var(--ink-soft);}
+  .icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  .tag{display:inline-flex;align-items:center;gap:.6em;font-family:"Space Mono",monospace;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:var(--paper-raised);border:1px solid var(--line);padding:.5em 1em;border-radius:3px;box-shadow:var(--shadow-sm);}
+  .tag i{width:6px;height:6px;background:var(--accent);flex:none;border-radius:1px;}
+
+  .btn{display:inline-flex;align-items:center;gap:.55em;justify-content:center;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.92rem;text-decoration:none;border-radius:4px;padding:.95em 1.6em;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--ink);color:var(--paper);box-shadow:var(--shadow-md);}
+  .btn-primary:hover{box-shadow:var(--shadow-lg);}
+  .btn-accent{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-md);}
+  .btn-accent:hover{box-shadow:var(--shadow-lg);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong);}
+
+  .btn-pulse{position:relative;overflow:hidden;animation:btnGlow 2.4s ease-in-out infinite;}
+  .btn-pulse:hover{animation-play-state:paused;}
+  .btn-pulse::after{content:"";position:absolute;top:0;left:-60%;width:35%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);mix-blend-mode:overlay;animation:btnShine 2.8s ease-in-out infinite;pointer-events:none;}
+  @keyframes btnGlow{
+    0%,100%{box-shadow:var(--shadow-md), 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent);}
+    50%{box-shadow:var(--shadow-lg), 0 0 0 8px color-mix(in srgb, var(--accent) 0%, transparent);}
+  }
+  @keyframes btnShine{
+    0%{left:-60%;}
+    55%{left:130%;}
+    100%{left:130%;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .btn-pulse{animation:none;}
+    .btn-pulse::after{display:none;}
+  }
+
+  /* ---- hazard stripe divider ---- */
+  .stripe{height:10px;background:repeating-linear-gradient(135deg,var(--accent) 0 14px,var(--ink) 14px 28px);opacity:.9;}
+
+  /* ---- topbar ---- */
+  .topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb, var(--paper) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:16px;padding-bottom:16px;}
+  .brand{display:flex;align-items:center;gap:.65em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em;}
+  .brand .mark{width:26px;height:26px;flex:none;}
+  .navlinks{display:flex;align-items:center;gap:28px;font-size:.88rem;font-weight:600;}
+  .navlinks a{text-decoration:none;color:var(--ink-soft);}
+  .navlinks a:hover{color:var(--ink);}
+  @media (max-width:760px){.navlinks .navitem{display:none;}}
+
+  /* ---- hero ---- */
+  .hero{padding-top:clamp(40px,7vw,76px);}
+  .hero .wrap{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(30px,5vw,64px);align-items:center;}
+  .hero h1{font-size:clamp(2.6rem,6.4vw,4.6rem);}
+  .hero h1 .hl{color:var(--accent);}
+  .hero .sub{margin-top:22px;font-size:1.08rem;max-width:46ch;}
+  .hero .tag{margin-bottom:22px;}
+  .hero .ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px;}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:44px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;}
+  .stat-row div{background:var(--paper-raised);padding:16px 10px;text-align:center;}
+  .stat-row b{display:block;font-family:"Big Shoulders Display",sans-serif;font-size:1.9rem;font-weight:800;color:var(--ink);line-height:1;}
+  .stat-row span{font-family:"Space Mono",monospace;font-size:.6rem;color:var(--ink-soft);letter-spacing:.04em;}
+
+  /* permit tag hero art */
+  .permit-art{position:relative;}
+  .permit-card{background:var(--paper-raised);border:1.5px dashed var(--line-strong);border-radius:10px;padding:26px 24px 24px;box-shadow:var(--shadow-lg);transform:rotate(-2deg);position:relative;}
+  .permit-card::before{content:"";position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:var(--paper);border:1.5px dashed var(--line-strong);}
+  .permit-card .ph{font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);display:flex;justify-content:space-between;margin-bottom:16px;}
+  .permit-card h3{font-size:1.5rem;margin-bottom:4px;}
+  .permit-card .row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.84rem;}
+  .permit-card .row:last-of-type{border-bottom:none;}
+  .permit-card .row span{color:var(--ink-soft);}
+  .permit-card .row b{font-weight:600;text-align:right;}
+  .stamp{position:absolute;right:-14px;bottom:-18px;width:104px;height:104px;transform:rotate(-14deg);}
+
+  /* ---- catalog ---- */
+  .catalog h2{font-size:clamp(2rem,4vw,2.9rem);}
+  .catalog .lead{margin-top:12px;}
+  .cat-grid{margin-top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media (max-width:980px){.cat-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:620px){.cat-grid{grid-template-columns:1fr;}}
+  .course{background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-md);overflow:hidden;position:relative;}
+  .course .punch{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:var(--paper);border:1.5px dashed var(--line-strong);}
+  .course .top{border-bottom:1.5px dashed var(--line-strong);padding:26px 26px 20px;}
+  .course .kicker{font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);display:flex;justify-content:space-between;margin-bottom:14px;}
+  .course h3{font-size:1.9rem;margin-bottom:10px;}
+  .course .desc{font-size:.92rem;margin:0;}
+  .course .mid{padding:20px 26px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .course .mid div{text-align:center;background:var(--paper-sunk);border-radius:6px;padding:10px 4px;}
+  .course .mid b{display:block;font-family:"Big Shoulders Display",sans-serif;font-size:1.3rem;font-weight:800;}
+  .course .mid span{font-family:"Space Mono",monospace;font-size:.58rem;color:var(--ink-soft);}
+  .course .bottom{padding:20px 26px 26px;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+  .course .price{font-family:"Big Shoulders Display",sans-serif;font-size:1.7rem;font-weight:800;}
+  .course .price small{display:block;font-family:"Space Mono",monospace;font-size:.6rem;font-weight:400;color:var(--ink-soft);text-transform:uppercase;}
+  .course.h2s .kicker{color:var(--teal);}
+  .badge{display:inline-block;font-family:"Space Mono",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;padding:.35em .7em;border-radius:3px;background:var(--accent-soft);color:var(--accent-2);}
+  .course.h2s .badge{background:var(--teal-soft);color:var(--teal);}
+
+  /* ---- how it works ---- */
+  .how{background:var(--paper-sunk);}
+  .how h2{font-size:clamp(2rem,4vw,2.9rem);}
+  .steps{margin-top:38px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media (max-width:900px){.steps{grid-template-columns:1fr 1fr;}}
+  @media (max-width:560px){.steps{grid-template-columns:1fr;}}
+  .steps div{background:var(--paper-raised);border:1px solid var(--line);border-radius:8px;padding:22px 18px;}
+  .steps .n{font-family:"Big Shoulders Display",sans-serif;font-size:2.4rem;font-weight:900;color:var(--accent);line-height:1;}
+  .steps .t{font-weight:700;font-size:.92rem;margin-top:10px;}
+  .steps .d{font-size:.82rem;color:var(--ink-soft);margin-top:6px;}
+
+  /* ---- instructor ---- */
+  .instructor .wrap{display:grid;grid-template-columns:.75fr 1.25fr;gap:clamp(28px,5vw,60px);align-items:center;}
+  .instructor .photo{aspect-ratio:1;background:var(--paper-sunk);border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Big Shoulders Display",sans-serif;font-size:5rem;font-weight:900;color:var(--ink-faint);}
+  .instructor h2{font-size:clamp(1.9rem,3.6vw,2.6rem);}
+  .instructor .role{font-family:"Space Mono",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-2);margin-top:6px;display:block;}
+  .instructor .bio{margin-top:16px;font-size:.98rem;}
+  .cred-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+  .cred-row span{font-family:"Space Mono",monospace;font-size:.68rem;background:var(--paper-sunk);border:1px solid var(--line);border-radius:3px;padding:.5em .8em;color:var(--ink-soft);}
+
+  /* ---- cta ---- */
+  .cta{background:var(--ink);color:var(--paper);}
+  .cta .wrap{text-align:center;}
+  .cta h2{color:var(--paper);font-size:clamp(2rem,4.4vw,3.2rem);}
+  .cta p{color:color-mix(in srgb, var(--paper) 70%, transparent);margin:16px auto 0;}
+  .cta .ctas{display:flex;justify-content:center;gap:14px;margin-top:30px;flex-wrap:wrap;}
+
+  footer{padding:36px 0 56px;border-top:1px solid var(--line);}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;align-items:center;}
+  footer .mono{font-size:.68rem;color:var(--ink-faint);}
+  footer a.enter{font-family:"Public Sans",sans-serif;font-weight:700;font-size:.85rem;color:var(--accent-2);text-decoration:none;display:inline-flex;align-items:center;gap:.4em;}
+
+  @media (max-width:860px){.hero .wrap, .instructor .wrap{grid-template-columns:1fr;}.stat-row{grid-template-columns:repeat(2,1fr);}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 26 26"><rect x="2" y="2" width="22" height="22" rx="3" transform="rotate(6 13 13)" fill="none" stroke="var(--accent)" stroke-width="2.2"></rect><circle cx="13" cy="13" r="3" fill="var(--accent)"></circle></svg>
+      TENEA
+    </div>
+    <nav class="navlinks">
+      <a class="navitem" href="#cursos">Cursos</a>
+      <a class="navitem" href="#como-funciona">Cómo funciona</a>
+      <a class="navitem" href="#instructor">Instructor</a>
+      <a href="admin-login.html" style="font-family:'Space Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);border:1px solid var(--line-strong);border-radius:999px;padding:.5em 1em;text-decoration:none;">Profesor</a>
+      <a class="btn btn-primary" href="login.html" style="font-size:.82rem;padding:.7em 1.3em;">Ingresar al aula</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="tag"><i></i>Plataforma de formación · Higiene y Seguridad · Argentina</span>
+        <h1>Formación que<br>se nota <span class="hl">en el campo.</span></h1>
+        <p class="sub">Cursos online de Rafael Carrizo, Técnico en Higiene y Seguridad Laboral, pensados para quienes arman, autorizan o auditan trabajo de riesgo — con la legislación argentina real detrás de cada módulo.</p>
+        <div class="ctas">
+          <a class="btn btn-accent" href="#cursos">Ver los cursos</a>
+          <a class="btn btn-ghost" href="login.html">Ingresar al aula →</a>
+        </div>
+        <div class="stat-row">
+          <div><b>10</b><span>CURSOS DISPONIBLES</span></div>
+          <div><b>10</b><span>MÓDULOS POR CURSO</span></div>
+          <div><b>100%</b><span>ONLINE, A TU RITMO</span></div>
+          <div><b>1</b><span>DIPLOMA POR CURSO</span></div>
+        </div>
+      </div>
+
+      <div class="permit-art">
+        <div class="permit-card">
+          <div class="ph"><span>TENEA · Nº 2026-004</span><span>Permiso de acceso</span></div>
+          <h3>Curso habilitado</h3>
+          <div class="row"><span>Alumno</span><b>Rafael C.</b></div>
+          <div class="row"><span>Catálogo</span><b>10 cursos HSE</b></div>
+          <div class="row"><span>Válido</span><b>Acceso permanente</b></div>
+          <div class="row"><span>Autoriza</span><b>TENEA</b></div>
+        </div>
+        <svg class="stamp" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="44" fill="none" stroke="var(--teal)" stroke-width="3"></circle>
+          <circle cx="50" cy="50" r="36" fill="none" stroke="var(--teal)" stroke-width="1.4" stroke-dasharray="2 3"></circle>
+          <text x="50" y="46" text-anchor="middle" font-family="Space Mono, monospace" font-size="10" fill="var(--teal)" font-weight="700">APROBADO</text>
+          <text x="50" y="60" text-anchor="middle" font-family="Space Mono, monospace" font-size="7" fill="var(--teal)">TENEA · HSE</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="stripe"></div>
+
+  <section class="catalog" id="cursos">
+    <div class="wrap">
+      <p class="tag"><i></i>Catálogo</p>
+      <h2 style="margin-top:16px;">10 cursos, cada uno completo.</h2>
+      <p class="lead">Cada curso de TENEA está escrito de punta a punta: 10 módulos con actividades, evaluación de 10 preguntas con tiempo límite y diploma al finalizar. Elegí el que necesitás.</p>
+      <div class="cat-grid">
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Ley 19.587</span><span>CERO-10</span></div>
+            <h3>Seguridad en Oil &amp; Gas desde Cero</h3>
+            <p class="desc">Peligro, riesgo y barreras, jerarquía de controles, EPP y energías peligrosas. El punto de partida antes de los cursos específicos.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=cero" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Decreto 351/79</span><span>PTW-10</span></div>
+            <h3>Permiso de Trabajo (PTW) para Oil &amp; Gas</h3>
+            <p class="desc">Cómo se arma, libera y cierra un permiso: aislamientos, atmósfera, y su relación con AST/JSA y LOTO.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=ptw" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Res. SRT 61/2023</span><span>ALT-10</span></div>
+            <h3>Trabajo en Altura en la Industria Petrolera</h3>
+            <p class="desc">Mecanismos de caída, sistemas de detención y posicionamiento, escaleras, andamios y plan de rescate.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=altura" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Res. SRT 953/10</span><span>ESP-10</span></div>
+            <h3>Espacios Confinados en Petróleo y Gas</h3>
+            <p class="desc">Identificación del espacio, peligros atmosféricos, permiso de ingreso, protección respiratoria y rescate.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=espacios" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Decreto 351/79</span><span>CAL-10</span></div>
+            <h3>Seguridad en Trabajos en Caliente</h3>
+            <p class="desc">Soldadura, oxicorte y esmerilado: preparación del área, monitoreo atmosférico y vigía de fuego.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=caliente" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Decreto 351/79</span><span>LOTO-10</span></div>
+            <h3>LOTO — Bloqueo y Etiquetado de Energías</h3>
+            <p class="desc">Identificación de energías peligrosas, secuencia de bloqueo grupal, verificación y restitución segura.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=loto" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Decreto 911/96</span><span>IZA-10</span></div>
+            <h3>Izaje y Operaciones con Grúas en Oil &amp; Gas</h3>
+            <p class="desc">Plan de izaje, accesorios y aparejos, zona de exclusión y condiciones ambientales para maniobras seguras.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=izaje" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Sistema SGA</span><span>QUI-10</span></div>
+            <h3>Seguridad con Sustancias Químicas en Oil &amp; Gas</h3>
+            <p class="desc">Lectura de SDS, almacenamiento y compatibilidad, respuesta ante derrames y EPP específico.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=quimicas" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Res. SRT 905/2015</span><span>AST-10</span></div>
+            <h3>Análisis de Riesgos — AST, JSA y ART</h3>
+            <p class="desc">Identificación y evaluación de peligros, jerarquía de controles, e integración con PTW y LOTO.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=riesgos" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+        <div class="course">
+          <div class="punch"></div>
+          <div class="top">
+            <div class="kicker"><span class="badge">Decreto 351/79</span><span>EME-10</span></div>
+            <h3>Respuesta ante Emergencias en Instalaciones Petroleras</h3>
+            <p class="desc">Incendios, fugas y derrames: alarmas, comando de incidente, evacuación y simulacros.</p>
+          </div>
+          <div class="mid" style="grid-template-columns:1fr 1fr;">
+            <div><b>10</b><span>MÓDULOS</span></div>
+            <div><b>10</b><span>EVALUACIONES</span></div>
+          </div>
+          <div class="bottom">
+            <div class="price">$25.000<small>ARS · pago único</small></div>
+            <a class="btn btn-accent btn-pulse" href="pago.html?c=emergencias" style="font-size:.82rem;padding:.75em 1.3em;">Comprar</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="como-funciona">
+    <div class="wrap">
+      <p class="tag"><i></i>Cómo funciona</p>
+      <h2 style="margin-top:16px;">De la inscripción al diploma.</h2>
+      <div class="steps">
+        <div><span class="n">01</span><div class="t">Elegís tu curso</div><div class="d">10 cursos HSE disponibles, cada uno con su propio programa.</div></div>
+        <div><span class="n">02</span><div class="t">Pagás una vez</div><div class="d">Sin mensualidades, acceso permanente al portal del alumno.</div></div>
+        <div><span class="n">03</span><div class="t">Avanzás módulo a módulo</div><div class="d">Contenido, actividad y mini evaluación en cada uno.</div></div>
+        <div><span class="n">04</span><div class="t">Rendís y te llevás el diploma</div><div class="d">Evaluación final integradora y certificado descargable.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="instructor" id="instructor">
+    <div class="wrap">
+      <div class="photo">RC</div>
+      <div>
+        <p class="tag"><i></i>Quién dicta los cursos</p>
+        <h2 style="margin-top:16px;">Rafael Carrizo</h2>
+        <span class="role">Técnico en Higiene y Seguridad Laboral</span>
+        <p class="bio">Técnico y auditor. Implementador de sistemas de gestión bajo las normas ISO 9001:2026, ISO 14001:2026 e ISO 45001:2018. TENEA nace de ese trabajo: cursos escritos por alguien que audita e implementa estos sistemas, no solo los explica.</p>
+        <div class="cred-row">
+          <span>Auditor de sistemas de gestión</span>
+          <span>Implementador ISO 9001:2026</span>
+          <span>ISO 14001:2026</span>
+          <span>ISO 45001:2018</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>¿Ya te anotaste?</h2>
+      <p>El portal del alumno tiene tus módulos, actividades y el diploma cuando termines.</p>
+      <div class="ctas">
+        <a class="btn btn-accent" href="login.html">Ingresar al aula</a>
+        <a class="btn btn-ghost" href="#cursos" style="color:var(--paper);border-color:color-mix(in srgb, var(--paper) 35%, transparent);">Ver cursos</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">TENEA © 2026 · Neuquén, Argentina</span>
+    <div style="display:flex;align-items:center;gap:20px;">
+      <a href="admin-login.html" class="mono" style="text-decoration:none;color:var(--ink-faint);">Acceso profesor</a>
+      <a class="enter" href="login.html">Portal del alumno <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

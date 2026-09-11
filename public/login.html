@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TENEA — Iniciar sesión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --teal:#2E7A94; --teal-soft:#DCEEF3; --teal-ink:#FFFFFF;
+    --shadow-md: 0 18px 40px -26px rgba(25,20,10,.35);
+    --shadow-lg: 0 30px 70px -30px rgba(25,20,10,.4);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+      --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+      --line:#26313F; --line-strong:#34415A;
+      --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+      --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+      --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+    --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+    --line:#26313F; --line-strong:#34415A;
+    --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+    --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+    --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  h1,h2{font-family:"Big Shoulders Display",ui-sans-serif,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1;}
+  .mono{font-family:"Space Mono",ui-monospace,monospace;}
+  .icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:clamp(28px,6vw,64px) 18px 60px;}
+  .brand{display:flex;align-items:center;gap:.6em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.4rem;text-transform:uppercase;text-decoration:none;margin-bottom:clamp(28px,6vw,48px);}
+  .brand .mark{width:24px;height:24px;flex:none;}
+
+  .authcard{width:100%;max-width:420px;background:var(--paper-raised);border:1.5px dashed var(--line-strong);border-radius:12px;box-shadow:var(--shadow-lg);padding:30px 28px 28px;position:relative;}
+  .authcard::before{content:"";position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:var(--paper);border:1.5px dashed var(--line-strong);}
+  .ph{font-family:"Space Mono",monospace;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);text-align:center;margin-bottom:6px;}
+
+  .switch{display:flex;background:var(--paper-sunk);border-radius:7px;padding:4px;margin:18px 0 22px;}
+  .switch button{flex:1;border:none;background:none;padding:.7em 0;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.84rem;color:var(--ink-soft);border-radius:5px;cursor:pointer;}
+  .switch button.active{background:var(--paper-raised);color:var(--ink);box-shadow:0 1px 3px rgba(20,27,38,.15);}
+
+  .field{display:grid;gap:6px;margin-bottom:14px;}
+  .field label{font-size:.76rem;font-weight:600;color:var(--ink-soft);}
+  .field input{width:100%;padding:.85em 1em;border-radius:7px;border:1.5px solid var(--line-strong);font-family:inherit;font-size:.92rem;background:var(--paper);color:var(--ink);}
+  .field input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .hint{font-size:.72rem;color:var(--ink-faint);margin-top:-6px;margin-bottom:14px;}
+  .hint b{color:var(--accent-2);font-weight:700;}
+
+  .btn{display:flex;width:100%;align-items:center;gap:.5em;justify-content:center;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.92rem;text-decoration:none;border-radius:7px;padding:.95em 1.4em;border:1.5px solid transparent;cursor:pointer;margin-top:6px;transition:transform .15s ease, box-shadow .15s ease;}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-accent{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-md);}
+
+  .form{display:none;}
+  .form.active{display:block;}
+
+  .form-error{background:var(--bad-soft,#f5dfd3);color:#B54A1F;font-size:.78rem;font-weight:600;padding:.7em 1em;border-radius:6px;margin:-4px 0 14px;}
+  .btn[disabled]{opacity:.6;cursor:default;transform:none!important;}
+  .foot{margin-top:22px;text-align:center;font-size:.74rem;color:var(--ink-faint);}
+  .foot a{color:var(--accent-2);text-decoration:none;font-weight:600;}
+  .back{margin-top:26px;font-size:.8rem;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:.4em;}
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 26 26"><rect x="2" y="2" width="22" height="22" rx="3" transform="rotate(6 13 13)" fill="none" stroke="var(--accent)" stroke-width="2.2"></rect><circle cx="13" cy="13" r="3" fill="var(--accent)"></circle></svg>
+    TENEA
+  </a>
+
+  <div class="authcard">
+    <div class="ph">Portal del alumno</div>
+    <h2 style="text-align:center;font-size:1.5rem;">Tu cuenta</h2>
+
+    <div class="switch">
+      <button type="button" class="active" data-form="login">Iniciar sesión</button>
+      <button type="button" data-form="register">Crear cuenta</button>
+    </div>
+
+    <form class="form active" id="loginForm">
+      <div class="field"><label for="li-email">Correo electrónico</label><input id="li-email" type="email" autocomplete="email" placeholder="tu@email.com" required></div>
+      <div class="field"><label for="li-pass">Contraseña</label><input id="li-pass" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
+      <div class="form-error" id="loginError" hidden></div>
+      <button class="btn btn-accent" id="loginGo" type="submit">Ingresar</button>
+    </form>
+
+    <form class="form" id="registerForm">
+      <div class="field-row">
+        <div class="field"><label for="re-nombre">Nombre</label><input id="re-nombre" type="text" placeholder="Rafael" required></div>
+        <div class="field"><label for="re-apellido">Apellido</label><input id="re-apellido" type="text" placeholder="Carrizo" required></div>
+      </div>
+      <div class="field"><label for="re-dni">DNI</label><input id="re-dni" type="text" inputmode="numeric" placeholder="00.000.000" required></div>
+      <div class="hint">Nombre, apellido y DNI van a figurar tal cual en tu <b>diploma de finalización</b>.</div>
+      <div class="field"><label for="re-email">Correo electrónico</label><input id="re-email" type="email" autocomplete="email" placeholder="tu@email.com" required></div>
+      <div class="field"><label for="re-pass">Contraseña</label><input id="re-pass" type="password" autocomplete="new-password" placeholder="•••••••• (mínimo 6 caracteres)" required minlength="6"></div>
+      <div class="form-error" id="registerError" hidden></div>
+      <button class="btn btn-accent" id="registerGo" type="submit">Crear cuenta y empezar</button>
+    </form>
+
+    <div class="foot" id="switchHint">¿No tenés cuenta? <a href="#" data-goto="register">Creá una</a></div>
+  </div>
+
+  <a class="back" href="index.html#cursos"><svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg> Volver al catálogo</a>
+</div>
+
+<script>
+  // Preserva el curso elegido en el catálogo (?c=slug) para inscribir al alumno en ese curso.
+  const courseParam = new URLSearchParams(location.search).get('c');
+  const suffix = courseParam ? ('?c=' + encodeURIComponent(courseParam)) : '';
+
+  async function submitAuth(url, payload, btn, errorEl){
+    errorEl.hidden = true;
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Un momento…';
+    try{
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if(!res.ok){
+        errorEl.textContent = data.error || 'No pudimos procesar la solicitud.';
+        errorEl.hidden = false;
+        return;
+      }
+      location.href = 'aula.html' + suffix;
+    }catch(e){
+      errorEl.textContent = 'No pudimos conectar con el servidor. Probá de nuevo.';
+      errorEl.hidden = false;
+    }finally{
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    submitAuth('/api/login', {
+      email: document.getElementById('li-email').value,
+      password: document.getElementById('li-pass').value,
+      course: courseParam || undefined,
+    }, document.getElementById('loginGo'), document.getElementById('loginError'));
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    submitAuth('/api/register', {
+      nombre: document.getElementById('re-nombre').value,
+      apellido: document.getElementById('re-apellido').value,
+      dni: document.getElementById('re-dni').value,
+      email: document.getElementById('re-email').value,
+      password: document.getElementById('re-pass').value,
+      course: courseParam || undefined,
+    }, document.getElementById('registerGo'), document.getElementById('registerError'));
+  });
+
+  const tabs = document.querySelectorAll('.switch button');
+  const forms = { login: document.getElementById('loginForm'), register: document.getElementById('registerForm') };
+  const hint = document.getElementById('switchHint');
+  function show(name){
+    tabs.forEach(b => b.classList.toggle('active', b.dataset.form === name));
+    Object.entries(forms).forEach(([k,f]) => f.classList.toggle('active', k === name));
+    hint.innerHTML = name === 'login'
+      ? '¿No tenés cuenta? <a href="#" data-goto="register">Creá una</a>'
+      : '¿Ya tenés cuenta? <a href="#" data-goto="login">Iniciá sesión</a>';
+    hint.querySelector('a').addEventListener('click', e => { e.preventDefault(); show(e.target.dataset.goto); });
+  }
+  tabs.forEach(b => b.addEventListener('click', () => show(b.dataset.form)));
+  hint.querySelector('a').addEventListener('click', e => { e.preventDefault(); show(e.target.dataset.goto); });
+</script>
+</body>
+</html>

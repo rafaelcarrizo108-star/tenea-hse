@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TENEA — Acceso profesor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --shadow-md: 0 18px 40px -26px rgba(25,20,10,.35);
+    --shadow-lg: 0 30px 70px -30px rgba(25,20,10,.4);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+      --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+      --line:#26313F; --line-strong:#34415A;
+      --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+      --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+    --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+    --line:#26313F; --line-strong:#34415A;
+    --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+    --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--ink);color:var(--paper);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  h1,h2{font-family:"Big Shoulders Display",ui-sans-serif,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;margin:0;line-height:1;}
+  .mono{font-family:"Space Mono",ui-monospace,monospace;}
+  .icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+
+  .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 18px;}
+  .brand{display:flex;align-items:center;gap:.6em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.4rem;text-transform:uppercase;text-decoration:none;margin-bottom:26px;color:var(--paper);}
+  .brand .mark{width:24px;height:24px;flex:none;}
+
+  .tag{display:inline-flex;align-items:center;gap:.5em;font-family:"Space Mono",monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-2);background:var(--accent-soft);padding:.5em 1em;border-radius:3px;margin-bottom:20px;}
+
+  .authcard{width:100%;max-width:400px;background:var(--paper-raised);color:var(--ink);border-radius:12px;box-shadow:var(--shadow-lg);padding:30px 28px 26px;}
+  .field{display:grid;gap:6px;margin-bottom:16px;}
+  .field label{font-size:.76rem;font-weight:600;color:var(--ink-soft);}
+  .field input{width:100%;padding:.85em 1em;border-radius:7px;border:1.5px solid var(--line-strong);font-family:inherit;font-size:.92rem;background:var(--paper);color:var(--ink);}
+  .field input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .btn{display:flex;width:100%;align-items:center;gap:.5em;justify-content:center;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.92rem;text-decoration:none;border-radius:7px;padding:.95em 1.4em;border:1.5px solid transparent;cursor:pointer;margin-top:6px;}
+  .btn-accent{background:var(--ink);color:var(--paper);}
+
+  .note{max-width:400px;margin-top:18px;font-size:.76rem;color:color-mix(in srgb, var(--paper) 55%, transparent);text-align:center;}
+  .back{margin-top:26px;font-size:.8rem;color:color-mix(in srgb, var(--paper) 65%, transparent);text-decoration:none;display:inline-flex;align-items:center;gap:.4em;}
+  .form-error{background:#3A2015;color:#E07A52;font-size:.78rem;font-weight:600;padding:.7em 1em;border-radius:6px;margin:-2px 0 14px;}
+  .btn[disabled]{opacity:.6;cursor:default;}
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 26 26"><rect x="2" y="2" width="22" height="22" rx="3" transform="rotate(6 13 13)" fill="none" stroke="var(--accent)" stroke-width="2.2"></rect><circle cx="13" cy="13" r="3" fill="var(--accent)"></circle></svg>
+    TENEA
+  </a>
+  <span class="tag">Acceso exclusivo de profesor</span>
+
+  <div class="authcard">
+    <h2 style="text-align:center;font-size:1.4rem;">Panel del profesor</h2>
+    <p style="text-align:center;color:var(--ink-soft);font-size:.86rem;margin:10px 0 22px;">Editar la plataforma, ver alumnos y habilitar accesos.</p>
+    <form id="adminForm">
+      <div class="field"><label for="ad-email">Correo electrónico</label><input id="ad-email" type="email" autocomplete="email" placeholder="rafaelcarrizo108@gmail.com" required></div>
+      <div class="field"><label for="ad-pass">Contraseña</label><input id="ad-pass" type="password" autocomplete="current-password" placeholder="••••••••" required></div>
+      <div class="form-error" id="adminError" hidden></div>
+      <button class="btn btn-accent" id="adminGo" type="submit">Ingresar al panel</button>
+    </form>
+  </div>
+  <p class="note">Esta cuenta es la única con permiso para modificar la plataforma y habilitar o deshabilitar el acceso de los alumnos.</p>
+  <a class="back" href="index.html"><svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg> Volver al sitio</a>
+</div>
+
+<script>
+  document.getElementById('adminForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('adminGo');
+    const errorEl = document.getElementById('adminError');
+    errorEl.hidden = true;
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Un momento…';
+    try{
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          email: document.getElementById('ad-email').value,
+          password: document.getElementById('ad-pass').value,
+        }),
+      });
+      const data = await res.json();
+      if(!res.ok){
+        errorEl.textContent = data.error || 'No pudimos iniciar sesión.';
+        errorEl.hidden = false;
+        return;
+      }
+      location.href = 'admin.html';
+    }catch(e){
+      errorEl.textContent = 'No pudimos conectar con el servidor. Probá de nuevo.';
+      errorEl.hidden = false;
+    }finally{
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+</script>
+</body>
+</html>

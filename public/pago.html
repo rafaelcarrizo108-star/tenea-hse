@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TENEA — Confirmar pago</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --teal:#2E7A94; --teal-soft:#DCEEF3; --teal-ink:#FFFFFF;
+    --good:#2F7D4F; --good-soft:#DCEEE1;
+    --shadow-md: 0 18px 40px -26px rgba(25,20,10,.35);
+    --shadow-lg: 0 30px 70px -30px rgba(25,20,10,.4);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+      --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+      --line:#26313F; --line-strong:#34415A;
+      --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+      --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+      --good:#5FBF83; --good-soft:#173322;
+      --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+    --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+    --line:#26313F; --line-strong:#34415A;
+    --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+    --teal:#5FB6D0; --teal-soft:#123240; --teal-ink:#062028;
+    --good:#5FBF83; --good-soft:#173322;
+    --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6); --shadow-lg: 0 30px 70px -30px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  h1,h2{font-family:"Big Shoulders Display",ui-sans-serif,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1;}
+  .mono{font-family:"Space Mono",ui-monospace,monospace;}
+  .icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  button{font:inherit;}
+
+  .page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:clamp(28px,6vw,64px) 18px 60px;}
+  .brand{display:flex;align-items:center;gap:.6em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.4rem;text-transform:uppercase;text-decoration:none;margin-bottom:clamp(24px,5vw,40px);}
+  .brand .mark{width:24px;height:24px;flex:none;}
+
+  .wrap{width:100%;max-width:460px;}
+  .kicker{text-align:center;font-family:"Space Mono",monospace;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;}
+  .h{text-align:center;font-size:clamp(1.5rem,4vw,1.9rem);}
+  .course-name{text-align:center;color:var(--accent-2);font-weight:700;font-size:.98rem;margin-top:10px;}
+
+  /* ---- receipt / transfer card ---- */
+  .receipt{margin-top:26px;background:var(--paper-raised);border:1.5px dashed var(--line-strong);border-radius:12px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+  .receipt::before{content:"";position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:var(--paper);border:1.5px dashed var(--line-strong);}
+  .receipt-head{padding:24px 26px 18px;text-align:center;border-bottom:1.5px dashed var(--line-strong);}
+  .receipt-head .amt-label{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);}
+  .receipt-head .amt{font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:clamp(2.4rem,8vw,3.2rem);color:var(--ink);margin-top:4px;line-height:1;}
+  .receipt-head .amt span{font-family:"Space Mono",monospace;font-size:.9rem;font-weight:400;color:var(--ink-soft);text-transform:uppercase;margin-left:.3em;}
+  .receipt-body{padding:22px 26px 26px;}
+  .alias-row{background:var(--accent-soft);border:1.5px dashed var(--accent);border-radius:9px;padding:16px 18px;text-align:center;}
+  .alias-row .lbl{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);}
+  .alias-row .alias{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:clamp(1.5rem,5vw,1.9rem);color:var(--accent-2);margin-top:4px;letter-spacing:.01em;}
+  .copy-btn{margin-top:12px;display:inline-flex;align-items:center;gap:.5em;background:var(--paper-raised);border:1.5px solid var(--accent);color:var(--accent-2);font-size:.78rem;font-weight:700;padding:.6em 1.1em;border-radius:7px;cursor:pointer;transition:transform .12s ease;}
+  .copy-btn:hover{transform:translateY(-1px);}
+  .copy-btn.copied{background:var(--good-soft);border-color:var(--good);color:var(--good);}
+
+  .steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:12px;}
+  .steps li{display:flex;gap:12px;align-items:flex-start;font-size:.86rem;color:var(--ink-soft);}
+  .steps .n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--paper-sunk);color:var(--ink);font-family:"Space Mono",monospace;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .steps b{color:var(--ink);}
+
+  .contact{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font-size:.8rem;color:var(--ink-soft);}
+  .contact a{color:var(--accent-2);font-weight:700;text-decoration:none;}
+
+  .btn{display:flex;width:100%;align-items:center;gap:.5em;justify-content:center;font-family:"Public Sans",sans-serif;font-weight:700;font-size:.92rem;text-decoration:none;border-radius:7px;padding:.95em 1.4em;border:1.5px solid transparent;cursor:pointer;margin-top:22px;transition:transform .15s ease, box-shadow .15s ease;}
+  .btn:hover{transform:translateY(-1px);}
+  .btn-accent{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow-md);}
+
+  .back{margin-top:24px;font-size:.8rem;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:.4em;}
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="brand" href="index.html">
+    <svg class="mark" viewBox="0 0 26 26"><rect x="2" y="2" width="22" height="22" rx="3" transform="rotate(6 13 13)" fill="none" stroke="var(--accent)" stroke-width="2.2"></rect><circle cx="13" cy="13" r="3" fill="var(--accent)"></circle></svg>
+    TENEA
+  </a>
+
+  <div class="wrap">
+    <p class="kicker">Reservá tu lugar</p>
+    <h1 class="h">Transferí para confirmar</h1>
+    <p class="course-name" id="courseName">Cargando curso…</p>
+
+    <div class="receipt">
+      <div class="receipt-head">
+        <div class="amt-label">Monto a transferir</div>
+        <div class="amt">$25.000<span>ARS</span></div>
+      </div>
+      <div class="receipt-body">
+        <div class="alias-row">
+          <div class="lbl">Alias</div>
+          <div class="alias mono" id="aliasText">Kelo.20</div>
+          <button class="copy-btn" id="copyBtn" type="button">
+            <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copiar alias
+          </button>
+        </div>
+
+        <ol class="steps">
+          <li><span class="n">1</span><span>Transferí <b>$25.000 ARS</b> al alias <b>Kelo.20</b> desde tu banco o Mercado Pago.</span></li>
+          <li><span class="n">2</span><span>Sacale una captura al comprobante.</span></li>
+          <li><span class="n">3</span><span>Creá tu cuenta y mandanos el comprobante — habilitamos tu acceso en cuanto lo confirmamos.</span></li>
+        </ol>
+
+        <a class="btn btn-accent" id="createAccountBtn" href="login.html">Ya transferí, crear mi cuenta →</a>
+
+        <p class="contact">¿Dudas con la transferencia? Mandá el comprobante junto con tu nombre y DNI a <a href="mailto:rafaelcarrizo108@gmail.com" id="contactEmail">rafaelcarrizo108@gmail.com</a>.</p>
+      </div>
+    </div>
+
+    <a class="back" href="index.html#cursos"><svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg> Volver al catálogo</a>
+  </div>
+</div>
+
+<script>
+  const TITLES = {
+    cero:"Seguridad en Oil & Gas desde Cero",
+    ptw:"Permiso de Trabajo (PTW) para Oil & Gas",
+    altura:"Trabajo en Altura en la Industria Petrolera",
+    espacios:"Espacios Confinados en Petróleo y Gas",
+    caliente:"Seguridad en Trabajos en Caliente",
+    loto:"LOTO — Bloqueo y Etiquetado de Energías",
+    izaje:"Izaje y Operaciones con Grúas en Oil & Gas",
+    quimicas:"Seguridad con Sustancias Químicas en Oil & Gas",
+    riesgos:"Análisis de Riesgos — AST, JSA y ART",
+    emergencias:"Respuesta ante Emergencias en Instalaciones Petroleras"
+  };
+
+  const slug = new URLSearchParams(location.search).get('c');
+  const courseNameEl = document.getElementById('courseName');
+  const createBtn = document.getElementById('createAccountBtn');
+
+  if(slug && TITLES[slug]){
+    courseNameEl.textContent = TITLES[slug];
+    createBtn.setAttribute('href', 'login.html?c=' + encodeURIComponent(slug));
+  } else {
+    courseNameEl.textContent = 'Elegí tu curso en el catálogo';
+    createBtn.setAttribute('href', 'login.html');
+  }
+
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText('Kelo.20');
+    }catch(e){ /* clipboard no disponible: el alias ya está visible en pantalla */ }
+    copyBtn.classList.add('copied');
+    copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M5 13l4 4L19 7"></path></svg> Copiado';
+    setTimeout(() => {
+      copyBtn.classList.remove('copied');
+      copyBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copiar alias';
+    }, 2000);
+  });
+</script>
+</body>
+</html>

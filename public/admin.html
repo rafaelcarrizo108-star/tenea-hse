@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TENEA — Panel del profesor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Public+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --good:#2F7D4F; --good-soft:#DCEEE1;
+    --bad:#B54A1F; --bad-soft:#F5DFD3;
+    --shadow-sm: 0 1px 2px rgba(25,20,10,.06);
+    --shadow-md: 0 18px 40px -26px rgba(25,20,10,.35);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+      --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+      --line:#26313F; --line-strong:#34415A;
+      --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+      --good:#5FBF83; --good-soft:#173322;
+      --bad:#E07A52; --bad-soft:#3A2015;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#E7EEF6; --ink-soft:#9FB0C2; --ink-faint:#6E7E92;
+    --paper:#0E141C; --paper-raised:#161E28; --paper-sunk:#0A0F15;
+    --line:#26313F; --line-strong:#34415A;
+    --accent:#5B9BD5; --accent-soft:#1C2E40; --accent-ink:#0B1622; --accent-2:#8FC1E8;
+    --good:#5FBF83; --good-soft:#173322;
+    --bad:#E07A52; --bad-soft:#3A2015;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4); --shadow-md: 0 18px 40px -26px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+  a{color:inherit;}
+  h1,h2{font-family:"Big Shoulders Display",ui-sans-serif,sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;margin:0;line-height:1;}
+  .mono{font-family:"Space Mono",ui-monospace,monospace;}
+  .icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;}
+  button{font:inherit;}
+
+  .topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--paper) 90%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:1240px;margin:0 auto;padding:14px clamp(16px,3vw,32px);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:.6em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.25rem;text-transform:uppercase;}
+  .brand .mark{width:22px;height:22px;flex:none;}
+  .brand .role{font-family:"Space Mono",monospace;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-2);background:var(--accent-soft);padding:.35em .6em;border-radius:3px;margin-left:2px;}
+  .who{display:flex;align-items:center;gap:14px;font-size:.8rem;}
+  .who a{color:var(--ink-soft);text-decoration:none;}
+  .who a:hover{color:var(--ink);}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:"Space Mono",monospace;font-weight:700;font-size:.68rem;}
+
+  .main{max-width:1240px;margin:0 auto;padding:26px clamp(16px,3vw,32px) 70px;}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+  .page-head h1{font-size:clamp(1.7rem,3vw,2.3rem);}
+  .page-head p{margin:6px 0 0;color:var(--ink-soft);font-size:.88rem;}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+  @media (max-width:760px){.stats{grid-template-columns:1fr 1fr;}}
+  .stat{background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow-sm);}
+  .stat b{display:block;font-family:"Big Shoulders Display",sans-serif;font-size:2rem;font-weight:800;line-height:1;}
+  .stat span{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);}
+  .stat.enabled b{color:var(--good);}
+  .stat.pending b{color:var(--bad);}
+
+  .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .filters button{border:1.5px solid var(--line-strong);background:var(--paper-raised);color:var(--ink-soft);padding:.55em 1.1em;border-radius:999px;font-size:.8rem;font-weight:600;cursor:pointer;}
+  .filters button.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .tablewrap{background:var(--paper-raised);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow-sm);overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:860px;}
+  thead th{text-align:left;font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);font-weight:400;padding:14px 16px;border-bottom:1px solid var(--line);}
+  tbody td{padding:14px 16px;border-bottom:1px solid var(--line);font-size:.88rem;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.row-disabled{background:color-mix(in srgb, var(--paper-sunk) 60%, transparent);}
+  tbody tr.row-disabled .student-name, tbody tr.row-disabled .course-name{color:var(--ink-faint);}
+
+  .student-name{font-weight:700;}
+  .student-dni{font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink-faint);margin-top:2px;}
+  .course-pill{display:inline-block;font-family:"Space Mono",monospace;font-size:.64rem;text-transform:uppercase;letter-spacing:.04em;padding:.3em .6em;border-radius:3px;background:var(--paper-sunk);color:var(--ink-soft);}
+
+  .progress-cell{display:flex;align-items:center;gap:10px;min-width:150px;}
+  .pbar{flex:1;height:7px;border-radius:99px;background:var(--paper-sunk);overflow:hidden;}
+  .pbar i{display:block;height:100%;background:var(--accent);border-radius:99px;}
+  .progress-cell .pct{font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink-soft);min-width:32px;text-align:right;}
+
+  .evals{font-size:.84rem;}
+  .evals .avg{font-family:"Space Mono",monospace;font-size:.72rem;color:var(--ink-faint);display:block;margin-top:2px;}
+
+  .status-badge{display:inline-flex;align-items:center;gap:.4em;font-size:.74rem;font-weight:700;padding:.35em .7em;border-radius:99px;}
+  .status-badge.on{background:var(--good-soft);color:var(--good);}
+  .status-badge.off{background:var(--bad-soft);color:var(--bad);}
+  .status-badge i{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  .access-cell{display:flex;align-items:center;gap:10px;}
+  .toggle{position:relative;width:42px;height:24px;border-radius:99px;border:none;cursor:pointer;background:var(--line-strong);flex:none;transition:background .15s ease;}
+  .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s ease;}
+  .toggle.on{background:var(--good);}
+  .toggle.on::after{transform:translateX(18px);}
+
+  .foot-note{margin-top:18px;font-size:.76rem;color:var(--ink-faint);max-width:70ch;}
+
+  .reset-btn{border:1.5px solid var(--line-strong);background:var(--paper-raised);color:var(--ink-soft);padding:.5em .9em;border-radius:6px;font-size:.76rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .reset-btn:hover{color:var(--ink);border-color:var(--ink-soft);}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);font-size:.84rem;padding:.9em 1.3em;border-radius:8px;box-shadow:var(--shadow-md);opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;max-width:90vw;text-align:center;z-index:100;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 26 26"><rect x="2" y="2" width="22" height="22" rx="3" transform="rotate(6 13 13)" fill="none" stroke="var(--accent)" stroke-width="2.2"></rect><circle cx="13" cy="13" r="3" fill="var(--accent)"></circle></svg>
+      TENEA <span class="role">Profesor</span>
+    </div>
+    <div class="who">
+      <a href="index.html">Ver sitio público</a>
+      <div class="avatar" id="adminAvatar">RC</div>
+      <span style="font-weight:600;" id="adminName">Rafael Carrizo</span>
+      <a href="/api/logout?to=/admin-login.html">Cerrar sesión</a>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="page-head">
+    <div>
+      <h1>Alumnos</h1>
+      <p>Progreso, evaluaciones y acceso de cada alumno inscripto. Solo vos podés habilitar o deshabilitar el acceso.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="statTotal">0</b><span>Alumnos inscriptos</span></div>
+    <div class="stat enabled"><b id="statOn">0</b><span>Con acceso habilitado</span></div>
+    <div class="stat pending"><b id="statOff">0</b><span>Pendientes de pago</span></div>
+    <div class="stat"><b id="statAvg">0</b><span>Promedio evaluaciones (0–10)</span></div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="active" data-course="all">Todos</button>
+    <button data-course="cero">Desde Cero</button>
+    <button data-course="ptw">PTW</button>
+    <button data-course="altura">Altura</button>
+    <button data-course="espacios">Esp. confinados</button>
+    <button data-course="caliente">Trab. en caliente</button>
+    <button data-course="loto">LOTO</button>
+    <button data-course="izaje">Izaje</button>
+    <button data-course="quimicas">Sust. químicas</button>
+    <button data-course="riesgos">AST/JSA/ART</button>
+    <button data-course="emergencias">Emergencias</button>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Alumno</th>
+          <th>Curso</th>
+          <th>Progreso</th>
+          <th>Evaluaciones</th>
+          <th>Acceso</th>
+          <th>Cuenta</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <p class="foot-note">Estos son los alumnos que se registraron de verdad en la plataforma. Al confirmar la transferencia por fuera del sitio, activá el acceso acá — el alumno entra al aula recién cuando el toggle está en verde. "Restablecer contraseña" genera una clave temporal real para pasarle al alumno si se olvida la suya.</p>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const COURSE_NAMES = {
+    cero:"Seguridad en Oil & Gas desde Cero", ptw:"Permiso de Trabajo (PTW) para Oil & Gas",
+    altura:"Trabajo en Altura en la Industria Petrolera", espacios:"Espacios Confinados en Petróleo y Gas",
+    caliente:"Seguridad en Trabajos en Caliente", loto:"LOTO — Bloqueo y Etiquetado de Energías",
+    izaje:"Izaje y Operaciones con Grúas en Oil & Gas", quimicas:"Seguridad con Sustancias Químicas en Oil & Gas",
+    riesgos:"Análisis de Riesgos — AST, JSA y ART", emergencias:"Respuesta ante Emergencias en Instalaciones Petroleras"
+  };
+
+  const rowsEl = document.getElementById('rows');
+  let students = [];
+  let currentFilter = 'all';
+
+  function initials(name){ return (name||'').split(' ').map(p=>p[0]).slice(0,2).join(''); }
+
+  async function guardAndLoad(){
+    try{
+      const meRes = await fetch('/api/me');
+      if(!meRes.ok) return location.href = 'admin-login.html';
+      const me = await meRes.json();
+      if(me.role !== 'professor') return location.href = 'admin-login.html';
+      document.getElementById('adminName').textContent = `${me.user.nombre} ${me.user.apellido}`;
+      document.getElementById('adminAvatar').textContent = initials(`${me.user.nombre} ${me.user.apellido}`);
+    }catch(e){
+      return location.href = 'admin-login.html';
+    }
+    await loadStudents();
+  }
+
+  async function loadStudents(){
+    const res = await fetch('/api/admin/students');
+    if(res.status === 403) return location.href = 'admin-login.html';
+    const data = await res.json();
+    students = data.students.map(s => ({
+      enrollmentId: s.enrollment_id,
+      userId: s.user_id,
+      name: `${s.nombre} ${s.apellido}`,
+      dni: s.dni,
+      course: s.course_slug,
+      courseName: COURSE_NAMES[s.course_slug] || s.course_slug,
+      total: Number(s.total_modules) || 10,
+      done: Number(s.done_modules) || 0,
+      evalsPass: Number(s.evals_pass) || 0,
+      evalsTotal: Number(s.evals_total) || 0,
+      avg: s.avg_score !== null ? Number(s.avg_score) : null,
+      enabled: !!s.enabled,
+    }));
+    renderRows(currentFilter);
+    renderStats();
+  }
+
+  function renderRows(filter){
+    const filtered = students.filter(s => filter === 'all' || s.course === filter);
+    if(filtered.length === 0){
+      rowsEl.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--ink-faint);padding:28px 16px;">Todavía no hay alumnos inscriptos en este curso.</td></tr>`;
+      return;
+    }
+    rowsEl.innerHTML = filtered.map(s => {
+      const pct = Math.round((s.done / s.total) * 100);
+      const evalsText = s.evalsTotal === 0
+        ? 'Sin evaluaciones todavía'
+        : `${s.evalsPass}/${s.evalsTotal} aprobadas<span class="avg">Promedio ${s.avg.toFixed(1)}/10</span>`;
+      return `
+      <tr class="${s.enabled ? '' : 'row-disabled'}">
+        <td>
+          <div class="student-name">${s.name}</div>
+          <div class="student-dni">DNI ${s.dni}</div>
+        </td>
+        <td><span class="course-pill">${s.courseName}</span></td>
+        <td>
+          <div class="progress-cell">
+            <div class="pbar"><i style="width:${pct}%;"></i></div>
+            <span class="pct">${s.done}/${s.total}</span>
+          </div>
+        </td>
+        <td class="evals">${evalsText}</td>
+        <td>
+          <div class="access-cell">
+            <button class="toggle ${s.enabled ? 'on' : ''}" data-enrollment-id="${s.enrollmentId}" aria-label="Habilitar o deshabilitar acceso de ${s.name}"></button>
+            <span class="status-badge ${s.enabled ? 'on' : 'off'}"><i></i>${s.enabled ? 'Habilitado' : 'Pendiente de pago'}</span>
+          </div>
+        </td>
+        <td>
+          <button class="reset-btn" data-user-id="${s.userId}" data-name="${s.name}">Restablecer contraseña</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    rowsEl.querySelectorAll('.toggle').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        try{
+          const res = await fetch('/api/admin/action', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ type: 'toggle-access', enrollmentId: Number(btn.dataset.enrollmentId) }),
+          });
+          if(res.ok) await loadStudents();
+          else showToast('No se pudo actualizar el acceso. Probá de nuevo.');
+        }finally{
+          btn.disabled = false;
+        }
+      });
+    });
+
+    rowsEl.querySelectorAll('.reset-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        try{
+          const res = await fetch('/api/admin/action', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ type: 'reset-password', userId: Number(btn.dataset.userId) }),
+          });
+          const data = await res.json();
+          if(res.ok){
+            showToast(`Nueva contraseña temporal para ${btn.dataset.name}: ${data.tempPassword} — compartísela vos por fuera de la plataforma.`);
+          }else{
+            showToast(data.error || 'No se pudo restablecer la contraseña.');
+          }
+        }finally{
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  let toastTimer = null;
+  function showToast(msg){
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 5000);
+  }
+
+  function renderStats(){
+    const total = students.length;
+    const on = students.filter(s => s.enabled).length;
+    const withEvals = students.filter(s => s.avg !== null);
+    const avg = withEvals.length ? (withEvals.reduce((a,s)=>a+s.avg,0) / withEvals.length) : 0;
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statOn').textContent = on;
+    document.getElementById('statOff').textContent = total - on;
+    document.getElementById('statAvg').textContent = avg.toFixed(1);
+  }
+
+  document.querySelectorAll('#filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.course;
+      renderRows(currentFilter);
+    });
+  });
+
+  guardAndLoad();
+</script>
+</body>
+</html>
