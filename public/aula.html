@@ -204,8 +204,9 @@
     </ul>
     <div class="diploma-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
-      <div class="t">Diploma bloqueado</div>
+      <div class="t" id="diplomaTitle">Diploma bloqueado</div>
       <div class="d" id="diplomaText">Se habilita al completar los 10 módulos + evaluación final. Figura con tu nombre, apellido y DNI tal como los registraste.</div>
+      <a class="navbtn primary" id="diplomaDownload" href="#" hidden style="margin-top:10px;display:inline-block;font-size:.78rem;padding:8px 12px;">Descargar contenido (PDF)</a>
     </div>
   </aside>
 
@@ -253,7 +254,13 @@
           <span id="timerText">10:00</span>
         </div>
       </div>
-      <div class="quiz-q" id="quizQ">
+      <div class="quiz-locked" id="quizIntro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+        <div class="t">Evaluación del módulo</div>
+        <div class="d">10 preguntas · mínimo 6/10 para aprobar · 10 minutos por intento · intentos ilimitados. El tiempo arranca a correr recién cuando apretás el botón.</div>
+        <button class="navbtn primary" id="quizStartBtn">Iniciar evaluación</button>
+      </div>
+      <div class="quiz-q" id="quizQ" hidden>
         <div class="q" id="quizQuestion"></div>
         <div id="quizOptions"></div>
         <div class="quiz-progress" id="quizProgress"></div>
@@ -285,118 +292,27 @@
 </div>
 
 <script>
-  // ---- Contenido real de los 10 cursos TENEA (módulo 1 de cada uno, a modo de demostración) ----
+  // ---- Contenido real de los 10 cursos TENEA ("Desde Cero" completo; el resto se completa progresivamente) ----
   const COURSES = {
-    cero: {
-      code:"CERO-10", title:"Seguridad en Oil & Gas desde Cero",
-      modules:["Introducción a la industria Oil & Gas","Peligro, riesgo, consecuencia y barreras","Jerarquía de controles y planificación preventiva","EPP, indumentaria y protección colectiva","Energías peligrosas y pérdida de contención","Incendio, explosión y atmósferas peligrosas","Comunicación, permisos y trabajo seguro","Cultura preventiva y respuesta ante emergencias","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"La industria de hidrocarburos comprende actividades de exploración, perforación, terminación de pozos, producción, separación, tratamiento, almacenamiento, transporte y despacho. Cada etapa modifica el perfil de riesgo.",
-      p2:"Para un trabajador nuevo, comprender el proceso es una medida preventiva. Una válvula cerrada, un equipo aparentemente detenido o una línea vacía pueden conservar presión, temperatura o energía almacenada.",
-      checklist:["Upstream: exploración, perforación y producción.","Midstream: gathering, tratamiento, almacenamiento y transporte.","Downstream: refinación, procesamiento, distribución y comercialización.","Contratistas: su coordinación preventiva debe integrarse al sistema del establecimiento."],
-      quiz:{q:"1.4 — Un equipo está detenido y aparentemente vacío antes de una intervención. ¿Qué corresponde asumir?",
-        options:["Que al estar detenido, ya no puede conservar energía ni presión.","Que puede conservar presión, temperatura o energía almacenada, y hay que verificarlo.","Que basta con mirarlo desde afuera para confirmar que está seguro.","Que si nunca dio problemas antes, no hace falta revisarlo esta vez.","Que la responsabilidad de verificar es solo del próximo turno."],
-        correct:1}
-    },
-    ptw: {
-      code:"PTW-10", title:"Permiso de Trabajo (PTW) para Oil & Gas",
-      modules:["Qué es un PTW y qué problema resuelve","Flujo de un PTW","Clasificación de trabajos y permisos asociados","Aislamientos y condiciones de liberación","Atmósfera y monitoreo","Interacción entre PTW, AST/JSA y LOTO","Suspensión, revalidación y cierre","Auditoría de la calidad del sistema PTW","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"Un permiso de trabajo es un sistema formal de control que permite autorizar una tarea bajo condiciones previamente verificadas. Su función principal es hacer visibles los peligros críticos, las aislaciones, las responsabilidades y las condiciones necesarias para ejecutar un trabajo.",
-      p2:"Un permiso no vuelve segura una tarea por el hecho de estar firmado. La autorización es válida únicamente mientras se mantienen las condiciones y barreras declaradas.",
-      checklist:["Definir alcance y límites.","Identificar peligros críticos y barreras.","Establecer responsables.","Verificar condiciones antes de liberar."],
-      quiz:{q:"1.4 — Un permiso de trabajo ya está firmado y autorizado. ¿Qué significa esto según el curso?",
-        options:["Que la tarea es segura de forma permanente, sin importar lo que cambie después.","Que la autorización es válida únicamente mientras se mantengan las condiciones y barreras declaradas.","Que ya no hace falta verificar nada durante la ejecución.","Que se puede reutilizar el mismo permiso para cualquier otra tarea similar.","Que el permiso ya no puede suspenderse bajo ninguna circunstancia."],
-        correct:1}
-    },
-    altura: {
-      code:"ALT-10", title:"Trabajo en Altura en la Industria Petrolera",
-      modules:["Concepto de trabajo en altura y mecanismos de caída","Jerarquía preventiva para altura","Sistemas de detención y posicionamiento","Escaleras, andamios y plataformas","Herramientas, objetos y condiciones ambientales","Inspección, mantenimiento y descarte","Plan de rescate y suspensión inerte","Gestión operativa y documentación","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Res. SRT 61/2023"],
-      p1:"El riesgo de altura no se reduce a “estar sobre cierta cantidad de metros”. Debe considerarse toda situación en la que una persona pueda caer a un nivel inferior, incluyendo plataformas, techos, estructuras, escaleras, equipos, andamios y aberturas.",
-      p2:"La Resolución SRT 61/2023 aprobó medidas específicas de seguridad en altura y estableció su aplicación por los empleadores cuando se ejecutan trabajos en altura, complementando la normativa general.",
-      checklist:["Caída a distinto nivel.","Caída de herramientas y materiales.","Deslizamiento y pérdida de equilibrio.","Rescate suspendido."],
-      quiz:{q:"1.4 — ¿De qué depende realmente el riesgo de un trabajo en altura, más allá de la cantidad de metros?",
-        options:["Solo de la cantidad de metros sobre el nivel del piso.","De la superficie, el acceso, la estabilidad, el entorno y la posibilidad de rescate.","Solo de si el trabajador usa arnés o no.","Solo del clima del día de la tarea.","Solo de la experiencia previa del trabajador."],
-        correct:1}
-    },
-    espacios: {
-      code:"ESP-10", title:"Espacios Confinados en Petróleo y Gas",
-      modules:["Identificación del espacio confinado","Peligros atmosféricos","Preparación e aislamiento","Permiso de ingreso y roles","Protección respiratoria y otros EPP","Operación durante el ingreso","Rescate y emergencias","Cierre, descontaminación y lecciones aprendidas","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Res. SRT 953/10","IRAM 3625"],
-      p1:"Los espacios confinados presentan restricciones de acceso o egreso y no están diseñados para ocupación continua. Tanques, recipientes, separadores, fosas, cámaras, pozos y determinados interiores de equipos pueden presentar estas características.",
-      p2:"En Oil & Gas, el peligro no es solamente “quedarse encerrado”. Pueden existir gases tóxicos, atmósferas inflamables, deficiencia de oxígeno, ingreso de productos, partes móviles, superficies calientes, inundación y dificultades para rescate.",
-      checklist:["Acceso/egreso restringido.","No diseñado para ocupación continua.","Atmósferas potencialmente peligrosas.","Riesgo de rescate complejo."],
-      quiz:{q:"1.3 — Medís la atmósfera en la boca de un tanque y da O₂ normal. ¿Qué corresponde hacer antes de autorizar el ingreso?",
-        options:["Autorizar: si la boca mide bien, el resto del tanque también.","Medir en profundidad y en distintos puntos: la atmósfera puede estratificarse.","Ventilar 5 minutos y autorizar sin volver a medir.","Registrar la medición y dejar el resto del control a cargo del vigía, sin volver a medir.","Esperar la autorización verbal del supervisor y omitir el registro escrito."],
-        correct:1}
-    },
-    caliente: {
-      code:"CAL-10", title:"Seguridad en Trabajos en Caliente",
-      modules:["Qué es un trabajo en caliente","Triángulo y condiciones de incendio","Preparación del área","Monitoreo atmosférico","Equipos de soldadura y oxicorte","Vigía de fuego y protección contra incendio","EPP y riesgos complementarios","Cierre y análisis posterior","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"Se considera trabajo en caliente, en sentido operativo, toda actividad capaz de generar una fuente de ignición: soldadura, oxicorte, esmerilado, calentamiento, uso de herramientas que produzcan chispas y otras actividades definidas por el procedimiento.",
-      p2:"En instalaciones petroleras, el riesgo aumenta por la presencia de hidrocarburos, vapores, residuos impregnados y líneas con producto. Una tarea aparentemente pequeña puede generar una fuente de ignición de alta energía.",
-      checklist:["Identificar fuentes de ignición.","Buscar combustibles y vapores.","Evaluar alternativa en frío.","Disponer de medios de extinción."],
-      quiz:{q:"1.3 — ¿Qué se considera trabajo en caliente, en sentido operativo?",
-        options:["Solamente la soldadura con arco eléctrico.","Toda actividad capaz de generar una fuente de ignición: soldadura, oxicorte, esmerilado, calentamiento u otras definidas por el procedimiento.","Cualquier tarea realizada en horario diurno.","Solo las tareas que superan los 40°C de temperatura ambiente.","Únicamente el uso de sopletes de gas."],
-        correct:1}
-    },
-    loto: {
-      code:"LOTO-10", title:"LOTO — Bloqueo y Etiquetado de Energías",
-      modules:["El concepto de energía peligrosa","Identificación del equipo y puntos de aislamiento","Secuencia de bloqueo","Bloqueo grupal y transferencia de responsabilidad","Verificación de ausencia de energía","LOTO en Oil & Gas: proceso, válvulas y presión","Retiro de bloqueo y restitución","Auditoría y errores frecuentes","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"Una máquina puede estar detenida y seguir siendo peligrosa. Energía eléctrica, presión, hidráulica, neumática, mecánica, gravitacional, térmica y química puede permanecer almacenada o volver al equipo por una fuente externa.",
-      p2:"LOTO es una metodología para asegurar que las fuentes peligrosas permanezcan aisladas y que nadie pueda energizar el equipo inadvertidamente. En Argentina no existe un único formato nacional obligatorio; debe integrarse a la gestión preventiva del empleador.",
-      checklist:["Identificar fuentes primarias y secundarias.","Aislar físicamente.","Bloquear.","Etiquetar y verificar."],
-      quiz:{q:"1.3 — ¿Por qué una máquina detenida puede seguir siendo peligrosa?",
-        options:["Porque siempre hace ruido aunque esté apagada.","Porque energía eléctrica, de presión, hidráulica, neumática, mecánica, gravitacional, térmica o química puede permanecer almacenada o volver por una fuente externa.","Porque los operadores suelen olvidar apagarla del todo.","Porque el color de la carcasa indica energía residual.","Porque las máquinas nuevas acumulan más calor que las viejas."],
-        correct:1}
-    },
-    izaje: {
-      code:"IZA-10", title:"Izaje y Operaciones con Grúas en Oil & Gas",
-      modules:["Principios del izaje seguro","Plan de izaje","Accesorios y aparejos","Estabilidad y terreno","Comunicación y roles","Zona de exclusión y cargas suspendidas","Condiciones ambientales y fallas","Inspecciones y documentación","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Decreto 351/79","Decreto 911/96"],
-      p1:"Izar es transferir una carga mediante un equipo y un sistema de aparejos. Los incidentes suelen derivarse de mala estimación del peso, selección incorrecta de accesorios, terreno insuficiente, interferencias, viento, mala comunicación o ingreso de personas bajo la carga.",
-      p2:"El Decreto 351/79 contiene requisitos para aparatos para izar, incluyendo reglas sobre cargas suspendidas, revisiones y condiciones de seguridad. Cada maniobra debe respetar los límites del fabricante y del equipo.",
-      checklist:["Carga y equipo.","Aparejos y terreno.","Trayectoria.","Personas expuestas."],
-      quiz:{q:"1.4 — Según el curso, ¿de qué suelen derivarse los incidentes de izaje?",
-        options:["Únicamente de fallas mecánicas de la grúa.","De mala estimación del peso, selección incorrecta de accesorios, terreno insuficiente, interferencias, viento, mala comunicación o ingreso de personas bajo la carga.","Únicamente de la antigüedad del operador.","Solo de condiciones climáticas extremas.","Solo de errores en el papeleo del permiso."],
-        correct:1}
-    },
-    quimicas: {
-      code:"QUI-10", title:"Seguridad con Sustancias Químicas en Oil & Gas",
-      modules:["Sustancias químicas típicas del sector","Sistema Globalmente Armonizado (SGA)","Lectura de SDS","Exposición y vías de ingreso","Almacenamiento y compatibilidad","Derrames y respuesta","EPP y controles específicos","Residuos químicos y aprendizaje","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"En Oil & Gas pueden encontrarse hidrocarburos, solventes, detergentes, inhibidores de corrosión, biocidas, desengrasantes, ácidos, bases, productos de tratamiento y gases comprimidos. Cada producto tiene peligros diferentes.",
-      p2:"El riesgo depende de toxicidad, volatilidad, corrosividad, inflamabilidad, reactividad, vía de exposición y cantidad. No debe inferirse seguridad por el nombre comercial.",
-      checklist:["Inflamables.","Tóxicos.","Corrosivos.","Reactivos y comprimidos."],
-      quiz:{q:"1.3 — ¿Por qué no debe inferirse la seguridad de un producto químico por su nombre comercial?",
-        options:["Porque los nombres comerciales cambian todos los años.","Porque el riesgo depende de toxicidad, volatilidad, corrosividad, inflamabilidad, reactividad, vía de exposición y cantidad — información que da la SDS, no el nombre.","Porque todos los productos comerciales son igual de peligrosos.","Porque el nombre comercial siempre oculta información legalmente.","Porque solo importa el color del envase."],
-        correct:1}
-    },
-    riesgos: {
-      code:"AST-10", title:"Análisis de Riesgos — AST, JSA y ART",
-      modules:["Fundamentos del análisis de riesgos","Identificación de peligros","Evaluación de riesgo","Jerarquía de controles aplicada","AST/JSA antes y durante la tarea","Integración con PTW y LOTO","Calidad del análisis y errores","Indicadores y mejora continua","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Res. SRT 905/2015"],
-      p1:"El análisis debe partir del trabajo real. Una descripción demasiado general como “mantenimiento de bomba” oculta pasos y peligros. Una buena descripción separa preparación, aislamiento, apertura, reparación, pruebas y puesta en servicio.",
-      p2:"AST, JSA y ART son denominaciones utilizadas por distintas organizaciones para herramientas similares de análisis previo de tarea. No existe una única metodología nacional obligatoria con esos nombres; lo relevante es la identificación y control efectivo de riesgos.",
-      checklist:["Definir tarea y dividir en pasos.","Identificar peligro.","Definir consecuencias.","Establecer controles."],
-      quiz:{q:"1.1 — ¿Qué problema genera una descripción de tarea demasiado general, como “mantenimiento de bomba”?",
-        options:["Ninguno, cuanto más general mejor para no perder tiempo.","Que oculta pasos y peligros: hay que separar preparación, aislamiento, apertura, reparación, pruebas y puesta en servicio.","Solo genera problemas si la tarea dura más de un día.","Solo afecta el papeleo, no la seguridad real.","Se soluciona agregando más firmas al formulario."],
-        correct:1}
-    },
-    emergencias: {
-      code:"EME-10", title:"Respuesta ante Emergencias en Instalaciones Petroleras",
-      modules:["Qué es una emergencia en Oil & Gas","Evaluación inicial de la emergencia","Alarmas, comunicaciones y comando","Incendios y explosiones","Fugas de gas y sustancias peligrosas","Derrames y pérdida de contención","Evacuación, refugio y primeros auxilios","Simulacros, coordinación externa y mejora","Actividad integradora y aplicación práctica","Evaluación final"],
-      law:["Ley 19.587","Decreto 351/79"],
-      p1:"Una emergencia es una situación que supera o amenaza con superar las condiciones normales de operación y requiere una respuesta organizada. Puede ser incendio, explosión, fuga de gas, pérdida de contención, derrame, accidente con múltiples víctimas o fenómeno meteorológico.",
-      p2:"La respuesta se apoya en prevención, preparación, respuesta y recuperación. Un buen plan parte de escenarios creíbles y recursos disponibles.",
-      checklist:["Escenario y alarma.","Evacuación.","Control.","Recuperación."],
-      quiz:{q:"1.2 — Según el curso, ¿en qué se apoya la respuesta ante una emergencia?",
-        options:["Únicamente en la rapidez individual de cada trabajador.","En prevención, preparación, respuesta y recuperación, a partir de escenarios creíbles y recursos disponibles.","Únicamente en la llamada a los bomberos.","Solo en simulacros anuales obligatorios.","Solo en la experiencia personal del supervisor de turno."],
-        correct:1}
-    }
+    cero:{code:"CERO-10",title:"Seguridad en Oil & Gas desde Cero",pdf:"material-cero.pdf",modules:["Introducción a la industria Oil & Gas","Peligro, riesgo, consecuencia y barreras","Jerarquía de controles y planificación preventiva","EPP, indumentaria y protección colectiva","Energías peligrosas y pérdida de contención","Incendio, explosión y atmósferas peligrosas","Comunicación, permisos y trabajo seguro","Cultura preventiva y respuesta ante emergencias","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"La industria de hidrocarburos comprende actividades de exploración, perforación, terminación de pozos, producción, separación, tratamiento, almacenamiento, transporte y despacho. Cada etapa modifica el perfil de riesgo.",p2:"Para un trabajador nuevo, comprender el proceso es una medida preventiva. Una válvula cerrada, un equipo aparentemente detenido o una línea vacía pueden conservar presión, temperatura o energía almacenada.",checklist:["Upstream: exploración, perforación y producción.","Midstream: gathering, tratamiento, almacenamiento y transporte.","Downstream: refinación, procesamiento, distribución y comercialización.","Contratistas: su coordinación preventiva debe integrarse al sistema del establecimiento."],quiz:{q:"1.4 — Un equipo está detenido y aparentemente vacío antes de una intervención. ¿Qué corresponde asumir?",options:["Que al estar detenido, ya no puede conservar energía ni presión.","Que puede conservar presión, temperatura o energía almacenada, y hay que verificarlo.","Que basta con mirarlo desde afuera para confirmar que está seguro.","Que si nunca dio problemas antes, no hace falta revisarlo esta vez.","Que la responsabilidad de verificar es solo del próximo turno."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"Peligro es toda fuente con potencial de causar daño: una sustancia inflamable, una superficie a presión, un desnivel. Riesgo es la combinación de la probabilidad de que ese daño ocurra y de la gravedad de sus consecuencias si ocurre. Un mismo peligro puede representar riesgos muy distintos según el contexto de la tarea.",p2:"Las barreras son las medidas que separan al peligro de sus consecuencias: pueden ser físicas (una guarda, un aislamiento), procedimentales (un permiso, una secuencia de bloqueo) o humanas (una verificación, una supervisión). Un incidente casi siempre implica la falla de más de una barrera al mismo tiempo, no de una sola.",checklist:["Peligro: fuente con potencial de daño.","Riesgo: probabilidad × consecuencia de ese daño.","Barrera: lo que separa al peligro de sus consecuencias.","Un incidente suele implicar la falla de varias barreras, no de una sola."],quiz:{q:"2.1 — Un tanque contiene un producto inflamable. ¿Cuál es el riesgo, a diferencia del peligro?",options:["El riesgo y el peligro son exactamente lo mismo.","El peligro es el producto inflamable; el riesgo depende de la probabilidad de ignición y la gravedad de sus consecuencias en ese contexto.","El riesgo es solo el tamaño del tanque.","El riesgo desaparece si el tanque tiene cartel de advertencia.","El peligro solo existe si ya hubo un incidente antes."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"La jerarquía de controles ordena las medidas preventivas de mayor a menor efectividad: eliminación del peligro, sustitución por algo menos peligroso, controles de ingeniería (aislar o contener el peligro), controles administrativos (procedimientos, capacitación, señalización) y, en último lugar, el equipo de protección personal.",p2:"Planificar preventivamente significa aplicar esta jerarquía antes de ejecutar la tarea, no durante. Empezar por el EPP invierte el orden: el EPP protege a la persona si todo lo anterior falla, pero no elimina el peligro en el origen.",checklist:["Eliminación: sacar el peligro de la tarea.","Sustitución: reemplazarlo por algo menos peligroso.","Controles de ingeniería: aislar o contener.","EPP: última barrera, no la primera medida."],quiz:{q:"3.2 — Según la jerarquía de controles, ¿qué lugar ocupa el EPP?",options:["El primero: siempre hay que empezar por el EPP.","El último: se usa cuando eliminación, sustitución, ingeniería y controles administrativos ya se aplicaron o no alcanzan por sí solos.","No forma parte de la jerarquía de controles.","Reemplaza a los controles de ingeniería si el trabajador tiene experiencia.","Solo se aplica en tareas de menos de una hora."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"El EPP es la barrera más cercana a la persona y la última línea de defensa, no la principal. Su selección depende del peligro específico identificado (respiratorio, auditivo, de caída, químico, térmico) y debe estar certificado para ese uso, no elegido por costumbre o disponibilidad.",p2:"La protección colectiva (barandas, barreras, ventilación, sistemas de detección) protege a todas las personas expuestas al mismo tiempo y no depende de que cada individuo la use correctamente. Por eso, frente a un mismo peligro, la protección colectiva se prioriza sobre el EPP individual siempre que sea posible.",checklist:["EPP: última barrera, específica para cada peligro identificado.","Debe estar certificado para el uso previsto.","Protección colectiva: protege a todos, no depende de un solo individuo.","Se prioriza la protección colectiva por sobre el EPP cuando ambas son posibles."],quiz:{q:"4.2 — ¿Por qué se prioriza la protección colectiva sobre el EPP individual cuando ambas opciones son posibles?",options:["Porque el EPP es siempre más caro.","Porque la protección colectiva protege a todas las personas expuestas y no depende de que cada una la use correctamente.","Porque el EPP ya no se fabrica para uso industrial.","Porque la ley prohíbe combinar ambas.","Porque la protección colectiva no requiere mantenimiento."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"Las energías peligrosas incluyen la eléctrica, mecánica, hidráulica, neumática, térmica, química y gravitacional. Un equipo detenido puede conservar energía almacenada (un resorte comprimido, una línea presurizada, una carga suspendida) que se libera si no se identifica y controla antes de intervenir.",p2:"La pérdida de contención ocurre cuando un fluido de proceso (hidrocarburo, gas, químico) sale de su recorrido previsto por una fuga, rotura o apertura no controlada. Es uno de los eventos de mayor potencial de daño en la industria, porque puede combinarse con fuentes de ignición o generar atmósferas peligrosas.",checklist:["Energía almacenada: puede permanecer aunque el equipo esté detenido.","Siete tipos de energía peligrosa: eléctrica, mecánica, hidráulica, neumática, térmica, química, gravitacional.","Pérdida de contención: salida no controlada de un fluido de proceso.","Verificar ausencia de energía antes de intervenir, nunca asumirla."],quiz:{q:"5.3 — ¿Qué caracteriza a una pérdida de contención en una instalación de Oil & Gas?",options:["Que un fluido de proceso sale de su recorrido previsto por una fuga, rotura o apertura no controlada.","Que un equipo cambia de color por el uso.","Que se completa un mantenimiento programado.","Que se actualiza un procedimiento escrito.","Que un trabajador termina su turno."],correct:0}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"El fuego requiere combustible, comburente (oxígeno) y una fuente de ignición actuando en simultáneo; eliminar cualquiera de los tres impide o corta la combustión. Una atmósfera explosiva se forma cuando un gas, vapor o polvo inflamable se mezcla con el aire en una proporción capaz de propagar una explosión si aparece una fuente de ignición.",p2:"En instalaciones de Oil & Gas, estas atmósferas pueden formarse en espacios ventilados de forma insuficiente, cerca de venteos, drenajes o durante aperturas de líneas. El control pasa por monitoreo atmosférico previo, ventilación y eliminación de fuentes de ignición no autorizadas en la zona.",checklist:["Triángulo del fuego: combustible, comburente, fuente de ignición.","Eliminar uno de los tres corta la combustión.","Atmósfera explosiva: mezcla inflamable de gas/vapor con aire.","Controlar con monitoreo, ventilación y control de fuentes de ignición."],quiz:{q:"6.1 — ¿Qué ocurre si se elimina uno de los tres elementos del triángulo del fuego?",options:["No cambia nada, los tres son independientes entre sí.","Se impide o se corta la combustión.","El fuego se vuelve más intenso.","Solo afecta el color de la llama.","Depende exclusivamente de la temperatura ambiente."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"Una comunicación clara entre turnos, cuadrillas y supervisión es en sí misma una barrera preventiva: evita que se retome una tarea sin conocer su estado real de aislamiento o avance. El permiso de trabajo (PTW) formaliza esa comunicación por escrito, dejando constancia de peligros, condiciones y responsables.",p2:"El PTW no actúa solo: se apoya en el análisis de riesgo de la tarea (AST/JSA) y, cuando corresponde, en el bloqueo y etiquetado de energías (LOTO). Los tres instrumentos están diseñados para integrarse entre sí, no para usarse de forma aislada.",checklist:["La comunicación efectiva entre turnos es una barrera preventiva.","El PTW formaliza por escrito peligros, condiciones y responsables.","El AST/JSA analiza el riesgo específico de la tarea.","LOTO, PTW y AST/JSA están diseñados para integrarse, no para usarse por separado."],quiz:{q:"7.2 — ¿Por qué no alcanza con tener un PTW firmado si no está integrado con el AST/JSA y, cuando corresponde, con LOTO?",options:["Porque el PTW pierde validez legal sin esos documentos.","Porque estos instrumentos están diseñados para integrarse: el PTW formaliza, el AST/JSA analiza el riesgo puntual y LOTO controla la energía; usados por separado dejan huecos preventivos.","Porque el AST/JSA reemplaza al PTW en instalaciones petroleras.","Porque LOTO solo se exige los días de auditoría.","Porque son trámites administrativos sin relación entre sí."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"La cultura preventiva es el conjunto de valores y comportamientos compartidos que hacen que la seguridad se sostenga incluso cuando nadie está controlando: reportar un casi-accidente, detener una tarea insegura o corregir a un compañero sin esperar una sanción. Se construye con liderazgo visible, coherencia entre lo que se dice y lo que se hace, y consecuencias claras.",p2:"Ninguna cultura preventiva elimina por completo la posibilidad de una emergencia. Por eso toda instalación necesita una respuesta organizada: reconocer la situación, alertar, activar los roles definidos y actuar según un plan conocido de antemano, no improvisado en el momento.",checklist:["Cultura preventiva: valores y comportamientos que sostienen la seguridad sin control externo.","Se construye con liderazgo visible y coherencia, no solo con normas escritas.","Ninguna cultura preventiva elimina el riesgo de emergencia por completo.","La respuesta ante emergencias debe estar definida antes de que ocurra, no improvisada."],quiz:{q:"8.1 — ¿Qué distingue a una cultura preventiva real de un conjunto de normas escritas?",options:["Que las normas escritas ya no son necesarias.","Que la cultura preventiva sostiene comportamientos seguros —como reportar o detener una tarea— incluso sin control externo, mientras que una norma por sí sola no garantiza esa conducta.","Que la cultura preventiva depende solo del área de HSE.","Que las normas escritas siempre generan más accidentes.","Que la cultura preventiva se mide únicamente en la cantidad de carteles instalados."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"Escenario integrador: te asignan intervenir una línea que estuvo en servicio hasta hace una hora. Está aparentemente vacía y el equipo aguas arriba está detenido. No hay PTW visible en el tablero y el compañero que hizo el último bloqueo ya se fue.",p2:"Aplicando lo visto en los módulos anteriores: primero se verifica peligro y energía almacenada (no se asume que está vacía ni sin presión), se prioriza protección colectiva y jerarquía de controles antes que el EPP como única medida, y no se interviene sin el PTW correspondiente ni sin confirmar el estado real del bloqueo con quien lo realizó o con el registro formal.",checklist:["No asumir ausencia de energía o presión sin verificarla.","No iniciar la tarea sin PTW visible y vigente.","Confirmar el estado del bloqueo por registro formal, no de palabra.","Aplicar la jerarquía de controles antes de recurrir solo al EPP."],quiz:{q:"9.1 — En el escenario planteado, ¿qué corresponde hacer antes de intervenir la línea?",options:["Empezar la tarea igual, ya que el equipo aguas arriba está detenido.","Verificar la ausencia real de energía/presión, confirmar el PTW vigente y el estado del bloqueo por registro formal antes de intervenir.","Usar EPP reforzado y avanzar sin más verificaciones.","Esperar a que vuelva el compañero, sin registrar nada mientras tanto.","Suponer que, al no haber PTW visible, no hace falta uno para esta tarea."],correct:1}},
+      {law:["Ley 19.587","Decreto 351/79"],p1:"Esta evaluación final integra los conceptos de los nueve módulos anteriores: comprensión del proceso productivo, diferencia entre peligro y riesgo, jerarquía de controles, EPP y protección colectiva, energías peligrosas y pérdida de contención, atmósferas explosivas, integración entre PTW/AST-JSA/LOTO, y cultura preventiva.",p2:"Aprobarla con 6/10 o más, junto con los módulos anteriores, habilita el diploma del curso \"Seguridad en Oil & Gas desde Cero\" a tu nombre, con tu DNI tal como lo registraste, y el material completo del curso queda disponible para descargar.",checklist:["Repasá la jerarquía de controles: eliminación > sustitución > ingeniería > administrativo > EPP.","Repasá la diferencia entre peligro, riesgo y barrera.","Repasá la integración entre PTW, AST/JSA y LOTO.","Recordá: intentos ilimitados, pero cada intento tiene 10 minutos."],quiz:{q:"10.1 — De las siguientes, ¿cuál es la secuencia correcta de la jerarquía de controles, de mayor a menor efectividad?",options:["EPP, controles administrativos, ingeniería, sustitución, eliminación.","Eliminación, sustitución, controles de ingeniería, controles administrativos, EPP.","Sustitución, EPP, eliminación, ingeniería, administrativo.","Controles administrativos, EPP, eliminación, sustitución, ingeniería.","Ingeniería, eliminación, EPP, sustitución, administrativo."],correct:1}}]},
+    ptw:{code:"PTW-10",title:"Permiso de Trabajo (PTW) para Oil & Gas",modules:["Qué es un PTW y qué problema resuelve","Flujo de un PTW","Clasificación de trabajos y permisos asociados","Aislamientos y condiciones de liberación","Atmósfera y monitoreo","Interacción entre PTW, AST/JSA y LOTO","Suspensión, revalidación y cierre","Auditoría de la calidad del sistema PTW","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"Un permiso de trabajo es un sistema formal de control que permite autorizar una tarea bajo condiciones previamente verificadas. Su función principal es hacer visibles los peligros críticos, las aislaciones, las responsabilidades y las condiciones necesarias para ejecutar un trabajo.",p2:"Un permiso no vuelve segura una tarea por el hecho de estar firmado. La autorización es válida únicamente mientras se mantienen las condiciones y barreras declaradas.",checklist:["Definir alcance y límites.","Identificar peligros críticos y barreras.","Establecer responsables.","Verificar condiciones antes de liberar."],quiz:{q:"1.4 — Un permiso de trabajo ya está firmado y autorizado. ¿Qué significa esto según el curso?",options:["Que la tarea es segura de forma permanente, sin importar lo que cambie después.","Que la autorización es válida únicamente mientras se mantengan las condiciones y barreras declaradas.","Que ya no hace falta verificar nada durante la ejecución.","Que se puede reutilizar el mismo permiso para cualquier otra tarea similar.","Que el permiso ya no puede suspenderse bajo ninguna circunstancia."],correct:1}}]},
+    altura:{code:"ALT-10",title:"Trabajo en Altura en la Industria Petrolera",modules:["Concepto de trabajo en altura y mecanismos de caída","Jerarquía preventiva para altura","Sistemas de detención y posicionamiento","Escaleras, andamios y plataformas","Herramientas, objetos y condiciones ambientales","Inspección, mantenimiento y descarte","Plan de rescate y suspensión inerte","Gestión operativa y documentación","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Res. SRT 61/2023"],p1:"El riesgo de altura no se reduce a “estar sobre cierta cantidad de metros”. Debe considerarse toda situación en la que una persona pueda caer a un nivel inferior, incluyendo plataformas, techos, estructuras, escaleras, equipos, andamios y aberturas.",p2:"La Resolución SRT 61/2023 aprobó medidas específicas de seguridad en altura y estableció su aplicación por los empleadores cuando se ejecutan trabajos en altura, complementando la normativa general.",checklist:["Caída a distinto nivel.","Caída de herramientas y materiales.","Deslizamiento y pérdida de equilibrio.","Rescate suspendido."],quiz:{q:"1.4 — ¿De qué depende realmente el riesgo de un trabajo en altura, más allá de la cantidad de metros?",options:["Solo de la cantidad de metros sobre el nivel del piso.","De la superficie, el acceso, la estabilidad, el entorno y la posibilidad de rescate.","Solo de si el trabajador usa arnés o no.","Solo del clima del día de la tarea.","Solo de la experiencia previa del trabajador."],correct:1}}]},
+    espacios:{code:"ESP-10",title:"Espacios Confinados en Petróleo y Gas",modules:["Identificación del espacio confinado","Peligros atmosféricos","Preparación e aislamiento","Permiso de ingreso y roles","Protección respiratoria y otros EPP","Operación durante el ingreso","Rescate y emergencias","Cierre, descontaminación y lecciones aprendidas","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Res. SRT 953/10","IRAM 3625"],p1:"Los espacios confinados presentan restricciones de acceso o egreso y no están diseñados para ocupación continua. Tanques, recipientes, separadores, fosas, cámaras, pozos y determinados interiores de equipos pueden presentar estas características.",p2:"En Oil & Gas, el peligro no es solamente “quedarse encerrado”. Pueden existir gases tóxicos, atmósferas inflamables, deficiencia de oxígeno, ingreso de productos, partes móviles, superficies calientes, inundación y dificultades para rescate.",checklist:["Acceso/egreso restringido.","No diseñado para ocupación continua.","Atmósferas potencialmente peligrosas.","Riesgo de rescate complejo."],quiz:{q:"1.3 — Medís la atmósfera en la boca de un tanque y da O₂ normal. ¿Qué corresponde hacer antes de autorizar el ingreso?",options:["Autorizar: si la boca mide bien, el resto del tanque también.","Medir en profundidad y en distintos puntos: la atmósfera puede estratificarse.","Ventilar 5 minutos y autorizar sin volver a medir.","Registrar la medición y dejar el resto del control a cargo del vigía, sin volver a medir.","Esperar la autorización verbal del supervisor y omitir el registro escrito."],correct:1}}]},
+    caliente:{code:"CAL-10",title:"Seguridad en Trabajos en Caliente",modules:["Qué es un trabajo en caliente","Triángulo y condiciones de incendio","Preparación del área","Monitoreo atmosférico","Equipos de soldadura y oxicorte","Vigía de fuego y protección contra incendio","EPP y riesgos complementarios","Cierre y análisis posterior","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"Se considera trabajo en caliente, en sentido operativo, toda actividad capaz de generar una fuente de ignición: soldadura, oxicorte, esmerilado, calentamiento, uso de herramientas que produzcan chispas y otras actividades definidas por el procedimiento.",p2:"En instalaciones petroleras, el riesgo aumenta por la presencia de hidrocarburos, vapores, residuos impregnados y líneas con producto. Una tarea aparentemente pequeña puede generar una fuente de ignición de alta energía.",checklist:["Identificar fuentes de ignición.","Buscar combustibles y vapores.","Evaluar alternativa en frío.","Disponer de medios de extinción."],quiz:{q:"1.3 — ¿Qué se considera trabajo en caliente, en sentido operativo?",options:["Solamente la soldadura con arco eléctrico.","Toda actividad capaz de generar una fuente de ignición: soldadura, oxicorte, esmerilado, calentamiento u otras definidas por el procedimiento.","Cualquier tarea realizada en horario diurno.","Solo las tareas que superan los 40°C de temperatura ambiente.","Únicamente el uso de sopletes de gas."],correct:1}}]},
+    loto:{code:"LOTO-10",title:"LOTO — Bloqueo y Etiquetado de Energías",modules:["El concepto de energía peligrosa","Identificación del equipo y puntos de aislamiento","Secuencia de bloqueo","Bloqueo grupal y transferencia de responsabilidad","Verificación de ausencia de energía","LOTO en Oil & Gas: proceso, válvulas y presión","Retiro de bloqueo y restitución","Auditoría y errores frecuentes","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"Una máquina puede estar detenida y seguir siendo peligrosa. Energía eléctrica, presión, hidráulica, neumática, mecánica, gravitacional, térmica y química puede permanecer almacenada o volver al equipo por una fuente externa.",p2:"LOTO es una metodología para asegurar que las fuentes peligrosas permanezcan aisladas y que nadie pueda energizar el equipo inadvertidamente. En Argentina no existe un único formato nacional obligatorio; debe integrarse a la gestión preventiva del empleador.",checklist:["Identificar fuentes primarias y secundarias.","Aislar físicamente.","Bloquear.","Etiquetar y verificar."],quiz:{q:"1.3 — ¿Por qué una máquina detenida puede seguir siendo peligrosa?",options:["Porque siempre hace ruido aunque esté apagada.","Porque energía eléctrica, de presión, hidráulica, neumática, mecánica, gravitacional, térmica o química puede permanecer almacenada o volver por una fuente externa.","Porque los operadores suelen olvidar apagarla del todo.","Porque el color de la carcasa indica energía residual.","Porque las máquinas nuevas acumulan más calor que las viejas."],correct:1}}]},
+    izaje:{code:"IZA-10",title:"Izaje y Operaciones con Grúas en Oil & Gas",modules:["Principios del izaje seguro","Plan de izaje","Accesorios y aparejos","Estabilidad y terreno","Comunicación y roles","Zona de exclusión y cargas suspendidas","Condiciones ambientales y fallas","Inspecciones y documentación","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Decreto 351/79","Decreto 911/96"],p1:"Izar es transferir una carga mediante un equipo y un sistema de aparejos. Los incidentes suelen derivarse de mala estimación del peso, selección incorrecta de accesorios, terreno insuficiente, interferencias, viento, mala comunicación o ingreso de personas bajo la carga.",p2:"El Decreto 351/79 contiene requisitos para aparatos para izar, incluyendo reglas sobre cargas suspendidas, revisiones y condiciones de seguridad. Cada maniobra debe respetar los límites del fabricante y del equipo.",checklist:["Carga y equipo.","Aparejos y terreno.","Trayectoria.","Personas expuestas."],quiz:{q:"1.4 — Según el curso, ¿de qué suelen derivarse los incidentes de izaje?",options:["Únicamente de fallas mecánicas de la grúa.","De mala estimación del peso, selección incorrecta de accesorios, terreno insuficiente, interferencias, viento, mala comunicación o ingreso de personas bajo la carga.","Únicamente de la antigüedad del operador.","Solo de condiciones climáticas extremas.","Solo de errores en el papeleo del permiso."],correct:1}}]},
+    quimicas:{code:"QUI-10",title:"Seguridad con Sustancias Químicas en Oil & Gas",modules:["Sustancias químicas típicas del sector","Sistema Globalmente Armonizado (SGA)","Lectura de SDS","Exposición y vías de ingreso","Almacenamiento y compatibilidad","Derrames y respuesta","EPP y controles específicos","Residuos químicos y aprendizaje","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"En Oil & Gas pueden encontrarse hidrocarburos, solventes, detergentes, inhibidores de corrosión, biocidas, desengrasantes, ácidos, bases, productos de tratamiento y gases comprimidos. Cada producto tiene peligros diferentes.",p2:"El riesgo depende de toxicidad, volatilidad, corrosividad, inflamabilidad, reactividad, vía de exposición y cantidad. No debe inferirse seguridad por el nombre comercial.",checklist:["Inflamables.","Tóxicos.","Corrosivos.","Reactivos y comprimidos."],quiz:{q:"1.3 — ¿Por qué no debe inferirse la seguridad de un producto químico por su nombre comercial?",options:["Porque los nombres comerciales cambian todos los años.","Porque el riesgo depende de toxicidad, volatilidad, corrosividad, inflamabilidad, reactividad, vía de exposición y cantidad — información que da la SDS, no el nombre.","Porque todos los productos comerciales son igual de peligrosos.","Porque el nombre comercial siempre oculta información legalmente.","Porque solo importa el color del envase."],correct:1}}]},
+    riesgos:{code:"AST-10",title:"Análisis de Riesgos — AST, JSA y ART",modules:["Fundamentos del análisis de riesgos","Identificación de peligros","Evaluación de riesgo","Jerarquía de controles aplicada","AST/JSA antes y durante la tarea","Integración con PTW y LOTO","Calidad del análisis y errores","Indicadores y mejora continua","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Res. SRT 905/2015"],p1:"El análisis debe partir del trabajo real. Una descripción demasiado general como “mantenimiento de bomba” oculta pasos y peligros. Una buena descripción separa preparación, aislamiento, apertura, reparación, pruebas y puesta en servicio.",p2:"AST, JSA y ART son denominaciones utilizadas por distintas organizaciones para herramientas similares de análisis previo de tarea. No existe una única metodología nacional obligatoria con esos nombres; lo relevante es la identificación y control efectivo de riesgos.",checklist:["Definir tarea y dividir en pasos.","Identificar peligro.","Definir consecuencias.","Establecer controles."],quiz:{q:"1.1 — ¿Qué problema genera una descripción de tarea demasiado general, como “mantenimiento de bomba”?",options:["Ninguno, cuanto más general mejor para no perder tiempo.","Que oculta pasos y peligros: hay que separar preparación, aislamiento, apertura, reparación, pruebas y puesta en servicio.","Solo genera problemas si la tarea dura más de un día.","Solo afecta el papeleo, no la seguridad real.","Se soluciona agregando más firmas al formulario."],correct:1}}]},
+    emergencias:{code:"EME-10",title:"Respuesta ante Emergencias en Instalaciones Petroleras",modules:["Qué es una emergencia en Oil & Gas","Evaluación inicial de la emergencia","Alarmas, comunicaciones y comando","Incendios y explosiones","Fugas de gas y sustancias peligrosas","Derrames y pérdida de contención","Evacuación, refugio y primeros auxilios","Simulacros, coordinación externa y mejora","Actividad integradora y aplicación práctica","Evaluación final"],content:[{law:["Ley 19.587","Decreto 351/79"],p1:"Una emergencia es una situación que supera o amenaza con superar las condiciones normales de operación y requiere una respuesta organizada. Puede ser incendio, explosión, fuga de gas, pérdida de contención, derrame, accidente con múltiples víctimas o fenómeno meteorológico.",p2:"La respuesta se apoya en prevención, preparación, respuesta y recuperación. Un buen plan parte de escenarios creíbles y recursos disponibles.",checklist:["Escenario y alarma.","Evacuación.","Control.","Recuperación."],quiz:{q:"1.2 — Según el curso, ¿en qué se apoya la respuesta ante una emergencia?",options:["Únicamente en la rapidez individual de cada trabajador.","En prevención, preparación, respuesta y recuperación, a partir de escenarios creíbles y recursos disponibles.","Únicamente en la llamada a los bomberos.","Solo en simulacros anuales obligatorios.","Solo en la experiencia personal del supervisor de turno."],correct:1}}]}
   };
 
   const params = new URLSearchParams(location.search);
@@ -413,6 +329,7 @@
   document.getElementById('pendingPagoBtn').setAttribute('href', 'pago.html?c=' + encodeURIComponent(slug));
 
   let enrollment = null;
+  let currentModuleIndex = 0;
   function initials(name){ return (name || '').split(' ').map(p => p[0]).slice(0,2).join(''); }
 
   function renderProgress(){
@@ -440,33 +357,83 @@
 
     const nextBtn = document.getElementById('nextModBtn');
     const nextHint = document.getElementById('nextHint');
-    const mod0Done = modulesProgress[0] && modulesProgress[0].completed;
-    nextBtn.textContent = `Módulo 02 · ${data.modules[1]} →`;
-    nextBtn.disabled = true;
-    nextHint.textContent = mod0Done
-      ? '✓ Evaluación aprobada — tu progreso quedó guardado. El módulo 02 se habilita a medida que sumamos contenido.'
-      : 'Aprobá la evaluación (6/10) para continuar';
-    nextHint.classList.toggle('ok', !!mod0Done);
+    const curDone = modulesProgress[currentModuleIndex] && modulesProgress[currentModuleIndex].completed;
+    const nextIndex = currentModuleIndex + 1;
+    const hasNextContent = !!(data.content[nextIndex]);
+    const isLastModule = currentModuleIndex >= data.modules.length - 1;
+
+    if(curDone && isLastModule){
+      nextBtn.textContent = '✓ Curso completado';
+      nextBtn.disabled = true;
+      nextHint.textContent = '¡Completaste los 10 módulos! Ya podés descargar el material del curso.';
+      nextHint.classList.add('ok');
+    } else if(curDone && hasNextContent){
+      nextBtn.textContent = `Módulo ${String(nextIndex+1).padStart(2,'0')} · ${data.modules[nextIndex]} →`;
+      nextBtn.disabled = false;
+      nextHint.textContent = '✓ Evaluación aprobada — tu progreso quedó guardado.';
+      nextHint.classList.add('ok');
+    } else if(curDone){
+      nextBtn.textContent = `Módulo ${String(nextIndex+1).padStart(2,'0')} · ${data.modules[nextIndex] || ''} →`;
+      nextBtn.disabled = true;
+      nextHint.textContent = '✓ Evaluación aprobada — tu progreso quedó guardado. El próximo módulo se habilita a medida que sumamos contenido.';
+      nextHint.classList.add('ok');
+    } else {
+      nextBtn.textContent = hasNextContent ? `Módulo ${String(nextIndex+1).padStart(2,'0')} · ${data.modules[nextIndex]} →` : '—';
+      nextBtn.disabled = true;
+      nextHint.textContent = 'Aprobá la evaluación (6/10) para continuar';
+      nextHint.classList.remove('ok');
+    }
+
+    // Diploma / descarga de contenido: se habilitan al completar el curso.
+    const diplomaTitle = document.getElementById('diplomaTitle');
+    const diplomaText = document.getElementById('diplomaText');
+    const diplomaDownload = document.getElementById('diplomaDownload');
+    if(doneCount === total){
+      diplomaTitle.textContent = '¡Curso completado!';
+      diplomaText.textContent = `Completaste los 10 módulos de "${data.title}". Tu diploma queda registrado a tu nombre y DNI.`;
+      if(data.pdf){
+        diplomaDownload.hidden = false;
+        diplomaDownload.href = data.pdf;
+        diplomaDownload.setAttribute('download', '');
+      }
+    } else {
+      diplomaTitle.textContent = 'Diploma bloqueado';
+      diplomaText.textContent = `Se habilita al completar los 10 módulos + evaluación final de "${data.title}". Figura con tu nombre, apellido y DNI tal como los registraste.`;
+      diplomaDownload.hidden = true;
+    }
   }
 
-  function renderContent(){
-    // Solo el módulo 1 de cada curso tiene contenido y evaluación interactiva por ahora.
+  function renderContent(idx){
     const data = COURSES[slug];
+    const mod = data.content[idx];
     document.getElementById('courseK').textContent = data.code + ' · Curso';
     document.getElementById('courseH2').textContent = data.title;
-    document.getElementById('diplomaText').textContent = `Se habilita al completar los 10 módulos + evaluación final de "${data.title}". Figura con tu nombre, apellido y DNI tal como los registraste.`;
 
-    document.getElementById('paneK').textContent = 'Módulo 01 de 10';
-    document.getElementById('paneH1').textContent = data.modules[0];
-    document.getElementById('lawrow').innerHTML = data.law.map(l => `<span>${l}</span>`).join('');
-    document.getElementById('contentP1').textContent = data.p1;
-    document.getElementById('contentP2').textContent = data.p2;
-    document.getElementById('checklistEl').innerHTML = data.checklist.map((c,i) => `<li><input type="checkbox" ${i<2?'checked':''} disabled> ${c}</li>`).join('');
+    document.getElementById('paneK').textContent = `Módulo ${String(idx+1).padStart(2,'0')} de ${data.modules.length}`;
+    document.getElementById('paneH1').textContent = data.modules[idx];
 
-    document.getElementById('quizBarK').textContent = `Evaluación · Módulo 01 · 10 preguntas`;
-    document.getElementById('quizQuestion').textContent = data.quiz.q;
-    document.getElementById('quizOptions').innerHTML = data.quiz.options.map((opt,i) => `<label><input type="radio" name="quizOpt" value="${i}" ${i===data.quiz.correct?'data-correct="true"':''}> ${opt}</label>`).join('');
-    document.getElementById('quizProgress').textContent = `Pregunta 1 de 10 · Módulo 01 · así se ven las otras 9 al rendir`;
+    if(!mod){
+      // Este módulo todavía no tiene contenido cargado.
+      document.getElementById('lawrow').innerHTML = '';
+      document.getElementById('contentP1').textContent = 'Estamos terminando de cargar el contenido de este módulo. Muy pronto vas a poder verlo acá.';
+      document.getElementById('contentP2').textContent = '';
+      document.getElementById('checklistEl').innerHTML = '';
+      document.getElementById('quizBarK').textContent = `Evaluación · Módulo ${String(idx+1).padStart(2,'0')}`;
+      document.getElementById('quizQuestion').textContent = '';
+      document.getElementById('quizOptions').innerHTML = '';
+      document.getElementById('quizProgress').textContent = '';
+      return;
+    }
+
+    document.getElementById('lawrow').innerHTML = mod.law.map(l => `<span>${l}</span>`).join('');
+    document.getElementById('contentP1').textContent = mod.p1;
+    document.getElementById('contentP2').textContent = mod.p2;
+    document.getElementById('checklistEl').innerHTML = mod.checklist.map((c) => `<li><input type="checkbox" disabled> ${c}</li>`).join('');
+
+    document.getElementById('quizBarK').textContent = `Evaluación · Módulo ${String(idx+1).padStart(2,'0')} · 10 preguntas`;
+    document.getElementById('quizQuestion').textContent = mod.quiz.q;
+    document.getElementById('quizOptions').innerHTML = mod.quiz.options.map((opt,i) => `<label><input type="radio" name="quizOpt" value="${i}" ${i===mod.quiz.correct?'data-correct="true"':''}> ${opt}</label>`).join('');
+    document.getElementById('quizProgress').textContent = `Pregunta 1 de 10 · Módulo ${String(idx+1).padStart(2,'0')} · así se ven las otras 9 al rendir`;
   }
 
   async function boot(){
@@ -513,9 +480,28 @@
 
     pendingPane.hidden = true;
     mainPane.hidden = false;
-    renderContent();
+
+    const modulesProgress = enrollment.modules;
+    const firstPending = modulesProgress.findIndex(m => !m.completed);
+    currentModuleIndex = firstPending === -1 ? COURSES[slug].modules.length - 1 : firstPending;
+
+    renderContent(currentModuleIndex);
     renderProgress();
-    initQuiz();
+    initQuiz(currentModuleIndex);
+
+    document.getElementById('nextModBtn').addEventListener('click', () => {
+      const data = COURSES[slug];
+      const nextIndex = currentModuleIndex + 1;
+      if(nextIndex >= data.modules.length || !data.content[nextIndex]) return;
+      currentModuleIndex = nextIndex;
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tabpanel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.tab[data-tab="contenido"]').classList.add('active');
+      document.querySelector('.tabpanel[data-panel="contenido"]').classList.add('active');
+      renderContent(currentModuleIndex);
+      renderProgress();
+      initQuiz(currentModuleIndex);
+    });
   }
 
   document.querySelectorAll('.tab').forEach(btn => {
@@ -529,23 +515,38 @@
 
   // ---- evaluación: 10 preguntas, 6/10 para aprobar, 10 minutos por intento, intentos ilimitados ----
   // El resultado se valida y se guarda en el servidor (incluido el límite de tiempo).
-  function initQuiz(){
+  // La evaluación NO arranca sola: el timer solo corre a partir de que el alumno aprieta "Iniciar evaluación".
+  function initQuiz(idx){
     const DURATION = 10 * 60;
     const TOTAL_Q = 10;
-    const MODULE_INDEX = 0;
+    const MODULE_INDEX = idx;
+    const data = COURSES[slug];
+    const hasContent = !!data.content[idx];
     const timerEl = document.getElementById('quizTimer');
     const timerText = document.getElementById('timerText');
+    const quizIntro = document.getElementById('quizIntro');
     const quizQ = document.getElementById('quizQ');
     const quizLocked = document.getElementById('quizLocked');
     const quizResult = document.getElementById('quizResult');
     const quizWarn = document.getElementById('quizWarn');
-    const submitBtn = document.getElementById('quizSubmit');
-    const timeoutRetryBtn = document.getElementById('quizRetry');
-    const resultRetryBtn = document.getElementById('resultRetry');
     const resultIcon = document.getElementById('resultIcon');
     const resultTitle = document.getElementById('resultTitle');
     const resultDetail = document.getElementById('resultDetail');
     if(!timerEl) return;
+
+    // Los botones se clonan para largarse sin listeners viejos de módulos anteriores.
+    const startBtn = cloneFresh('quizStartBtn');
+    const submitBtn = cloneFresh('quizSubmit');
+    const timeoutRetryBtn = cloneFresh('quizRetry');
+    const resultRetryBtn = cloneFresh('resultRetry');
+    function cloneFresh(id){
+      const el = document.getElementById(id);
+      if(!el) return null;
+      const fresh = el.cloneNode(true);
+      el.replaceWith(fresh);
+      return fresh;
+    }
+
     let remaining = DURATION;
     let interval = null;
     const ICON_OK = '<circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.5 2.5 4.5-5"></path>';
@@ -558,7 +559,23 @@
       timerEl.classList.toggle('warn', remaining <= 60);
     }
     function hideAllStates(){
-      quizQ.hidden = true; quizLocked.hidden = true; quizResult.hidden = true;
+      quizIntro.hidden = true; quizQ.hidden = true; quizLocked.hidden = true; quizResult.hidden = true;
+    }
+    function showIntro(){
+      clearInterval(interval);
+      hideAllStates();
+      const introTitle = quizIntro.querySelector('.t');
+      const introDesc = quizIntro.querySelector('.d');
+      if(hasContent){
+        introTitle.textContent = 'Evaluación del módulo';
+        introDesc.textContent = '10 preguntas · mínimo 6/10 para aprobar · 10 minutos por intento · intentos ilimitados. El tiempo arranca a correr recién cuando apretás el botón.';
+        if(startBtn) startBtn.hidden = false;
+      } else {
+        introTitle.textContent = 'Todavía no disponible';
+        introDesc.textContent = 'Estamos terminando de cargar el contenido y la evaluación de este módulo. Tu progreso ya guardado se mantiene.';
+        if(startBtn) startBtn.hidden = true;
+      }
+      quizIntro.hidden = false;
     }
     function lockQuiz(){
       clearInterval(interval);
@@ -607,6 +624,7 @@
       }
     }
     async function start(){
+      if(!hasContent) return;
       remaining = DURATION;
       hideAllStates();
       quizQ.hidden = false;
@@ -627,6 +645,7 @@
         });
       }catch(e){ /* el timer local sigue corriendo igual */ }
     }
+    startBtn && startBtn.addEventListener('click', start);
     submitBtn && submitBtn.addEventListener('click', () => {
       const checked = quizQ.querySelector('input[name="quizOpt"]:checked');
       if(!checked){ quizWarn.hidden = false; return; }
@@ -634,9 +653,9 @@
       const correctCount = checked.dataset.correct === 'true' ? 9 : 4;
       showResult(correctCount);
     });
-    timeoutRetryBtn && timeoutRetryBtn.addEventListener('click', start);
-    resultRetryBtn && resultRetryBtn.addEventListener('click', start);
-    start();
+    timeoutRetryBtn && timeoutRetryBtn.addEventListener('click', showIntro);
+    resultRetryBtn && resultRetryBtn.addEventListener('click', showIntro);
+    showIntro();
   }
 
   boot();
