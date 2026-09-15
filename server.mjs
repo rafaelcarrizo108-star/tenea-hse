@@ -328,6 +328,33 @@ app.post("/api/progress", wrap(async (req, res) => {
   return res.status(400).json({ error: "Acción desconocida" });
 }));
 
+// ---------- Material teórico en PDF (solo con el curso completo) ----------
+app.get("/api/material", wrap(async (req, res) => {
+  const session = sessionFrom(req);
+  if (!session || session.role !== "student") {
+    return res.status(401).send("Tenés que iniciar sesión para descargar el material.");
+  }
+  const course = String(req.query.course || "");
+  if (!isValidCourse(course)) return res.status(400).send("Curso inválido.");
+
+  const [enrollment] = await sql`
+    SELECT id, enabled FROM enrollments WHERE user_id = ${session.uid} AND course_slug = ${course}
+  `;
+  if (!enrollment || !enrollment.enabled) return res.status(403).send("No tenés acceso a este curso.");
+
+  const [row] = await sql`
+    SELECT COUNT(*) FILTER (WHERE completed) AS done FROM progress WHERE enrollment_id = ${enrollment.id}
+  `;
+  if (Number(row?.done || 0) < MODULES_PER_COURSE) {
+    return res.status(403).send("El material se habilita al aprobar la evaluación final del curso.");
+  }
+
+  return res.download(
+    path.join(__dirname, "materiales", `TENEA-${course}.pdf`),
+    `TENEA - Material teorico - ${course}.pdf`
+  );
+}));
+
 // ---------- Archivos estáticos (HTML) ----------
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
 
