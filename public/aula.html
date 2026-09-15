@@ -400,7 +400,7 @@
 
   const params = new URLSearchParams(location.search);
   let slug = params.get('c');
-  if(!slug || !COURSES[slug]) slug = 'ptw';
+  if(slug && !COURSES[slug]) slug = null; // curso inválido en la URL: se resuelve más abajo con los datos reales del alumno
   const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>';
 
   const switchEl = document.getElementById('courseSwitch');
@@ -487,6 +487,16 @@
     }
     document.getElementById('studentName').textContent = `${me.user.nombre} ${me.user.apellido}`;
     document.getElementById('studentAvatar').textContent = initials(`${me.user.nombre} ${me.user.apellido}`);
+
+    if(!slug){
+      // No vino un curso explícito en el link (?c=...): elegimos uno real del alumno
+      // en vez de asumir un curso fijo, para no mostrarle "pendiente de pago" en un
+      // curso que ni siquiera es el suyo.
+      const enabledEnr = me.enrollments.find(e => e.enabled);
+      slug = (enabledEnr || me.enrollments[0] || {}).course || 'ptw';
+      switchEl.value = slug;
+      document.getElementById('pendingPagoBtn').setAttribute('href', 'pago.html?c=' + encodeURIComponent(slug));
+    }
 
     enrollment = me.enrollments.find(e => e.course === slug);
     if(!enrollment){
