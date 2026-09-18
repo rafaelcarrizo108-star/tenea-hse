@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diploma — TENEA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Public+Sans:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#141B26; --ink-soft:#57667A; --ink-faint:#8493A6;
+    --paper:#F1F5FA; --paper-raised:#FFFFFF; --paper-sunk:#E6EDF6;
+    --line:#DAE3EE; --line-strong:#C1D0E1;
+    --accent:#2F6FA8; --accent-soft:#DCEAF7; --accent-ink:#FFFFFF; --accent-2:#1F5788;
+    --good:#2F7D4F; --good-soft:#DCEEE1;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;padding:24px 16px 60px;}
+  .toolbar{max-width:900px;margin:0 auto 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .back{font-size:.8rem;color:var(--ink-soft);text-decoration:none;display:flex;align-items:center;gap:.4em;}
+  .printbtn{font-family:"Public Sans",sans-serif;font-weight:700;font-size:.82rem;color:var(--accent-ink);background:var(--accent);border:none;padding:.7em 1.2em;border-radius:6px;cursor:pointer;}
+  .printbtn:hover{background:var(--accent-2);}
+  .cert{max-width:900px;margin:0 auto;background:var(--paper-raised);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 40px -12px rgba(20,27,38,.18);padding:56px 48px;position:relative;overflow:hidden;}
+  .cert::before{content:"";position:absolute;inset:14px;border:1.5px solid var(--line-strong);border-radius:8px;pointer-events:none;}
+  .brand{display:flex;align-items:center;justify-content:center;gap:.6em;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em;color:var(--accent-2);}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--good);}
+  .kicker{text-align:center;font-family:"Space Mono",monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:18px;}
+  h1{text-align:center;font-family:"Big Shoulders Display",sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:.01em;font-size:2.1rem;color:var(--ink);margin:8px 0 0;}
+  .nombre{text-align:center;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:2.6rem;color:var(--accent-2);margin:26px 0 0;text-transform:uppercase;letter-spacing:.01em;word-break:break-word;}
+  .dni{text-align:center;font-family:"Space Mono",monospace;font-size:.78rem;color:var(--ink-faint);margin-top:6px;}
+  .curso-wrap{text-align:center;color:var(--ink-soft);font-size:.92rem;margin-top:26px;}
+  .curso{display:block;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:1.35rem;color:var(--ink);text-transform:uppercase;margin-top:6px;}
+  .badge{display:flex;justify-content:center;margin-top:26px;}
+  .badge span{display:inline-flex;align-items:center;gap:.5em;font-family:"Space Mono",monospace;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--good);background:var(--good-soft);padding:.5em 1em;border-radius:99px;}
+  .foot{display:grid;grid-template-columns:1fr 1fr;align-items:start;margin-top:48px;gap:28px;}
+  .foot .col{text-align:center;}
+  .foot .line{border-top:1.5px solid var(--line-strong);margin-bottom:8px;}
+  .foot .lbl{font-family:"Space Mono",monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);}
+  .foot .val{font-size:.82rem;color:var(--ink-soft);margin-top:2px;}
+  .foot .firma-nombre{font-size:.92rem;font-weight:700;color:var(--ink);margin-top:4px;}
+  .foot .firma-rol{font-size:.74rem;color:var(--ink-soft);margin-top:2px;line-height:1.35;}
+  .warn{max-width:900px;margin:18px auto 0;font-size:.76rem;color:var(--ink-faint);text-align:center;}
+  .missing{color:#b03a2e;}
+  .center{max-width:520px;margin:80px auto;text-align:center;color:var(--ink-soft);}
+  .center a{color:var(--accent-2);font-weight:700;}
+  @media print{
+    body{padding:0;background:#fff;}
+    .toolbar{display:none;}
+    .cert{box-shadow:none;border:1px solid #ccc;}
+    .warn{display:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a class="back" href="#" onclick="history.back();return false;">&larr; Volver al aula</a>
+    <button class="printbtn" id="printBtn" onclick="window.print()" hidden>🖨️ Imprimir / Guardar como PDF</button>
+  </div>
+
+  <div id="root">
+    <div class="center">Cargando tu certificado…</div>
+  </div>
+
+  <script>
+    const COURSE_TITLES = {
+      cero: "Seguridad en Oil & Gas desde Cero",
+      ptw: "Permiso de Trabajo (PTW) para Oil & Gas",
+      altura: "Trabajo en Altura en la Industria Petrolera",
+      espacios: "Espacios Confinados en Petróleo y Gas",
+      caliente: "Seguridad en Trabajos en Caliente",
+      loto: "LOTO — Bloqueo y Etiquetado de Energías",
+      izaje: "Izaje y Operaciones con Grúas en Oil & Gas",
+      quimicas: "Seguridad con Sustancias Químicas en Oil & Gas",
+      riesgos: "Análisis de Riesgos — AST, JSA y ART",
+      emergencias: "Respuesta ante Emergencias en Instalaciones Petroleras",
+    };
+    const TOTAL_MODULES = 10;
+    const root = document.getElementById('root');
+    const printBtn = document.getElementById('printBtn');
+
+    function centro(html) {
+      root.innerHTML = '<div class="center">' + html + '</div>';
+    }
+
+    async function boot() {
+      const params = new URLSearchParams(location.search);
+      const slug = params.get('c');
+
+      let me;
+      try {
+        const res = await fetch('/api/me');
+        if (res.status === 401) { location.href = 'login.html'; return; }
+        me = await res.json();
+      } catch (e) {
+        centro('No pudimos conectar con TENEA para verificar tu certificado. Volvé a intentar en unos segundos.');
+        return;
+      }
+
+      if (me.role !== 'student') {
+        centro('Esta página es para alumnos. <a href="aula.html">Volver al aula</a>');
+        return;
+      }
+
+      const enrollments = me.enrollments || [];
+      let enr = enrollments.find(e => e.course === slug);
+      if (!enr) enr = enrollments.find(e => e.enabled);
+      if (!enr) {
+        centro('No encontramos un curso habilitado para tu cuenta. <a href="aula.html">Volver al aula</a>');
+        return;
+      }
+
+      const doneCount = (enr.modules || []).filter(m => m.completed).length;
+      if (doneCount < TOTAL_MODULES) {
+        centro('Todavía no completaste los 10 módulos + la evaluación final de este curso (llevás ' + doneCount + ' / ' + TOTAL_MODULES + '). Cuando termines, el certificado se habilita automáticamente. <a href="aula.html?c=' + encodeURIComponent(enr.course) + '">Volver al curso</a>');
+        return;
+      }
+
+      const nombreCompleto = [me.user.nombre, me.user.apellido].filter(Boolean).join(' ').trim();
+      const curso = COURSE_TITLES[enr.course] || enr.course;
+      const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      root.innerHTML = `
+        <div class="cert">
+          <div class="brand"><span class="dot"></span> TENEA</div>
+          <div class="kicker">Certificado de finalización</div>
+          <h1>Se otorga el presente certificado a</h1>
+          <div class="nombre">${nombreCompleto || 'Nombre no informado'}</div>
+          <div class="dni">${me.user.dni ? ('DNI ' + me.user.dni) : ''}</div>
+          <div class="curso-wrap">
+            por haber completado satisfactoriamente el curso
+            <span class="curso">${curso}</span>
+          </div>
+          <div class="badge"><span>✓ Evaluación final aprobada</span></div>
+          <div class="foot">
+            <div class="col">
+              <div class="line"></div>
+              <div class="lbl">Fecha</div>
+              <div class="val">${fecha}</div>
+            </div>
+            <div class="col">
+              <div class="line"></div>
+              <div class="lbl">Certificado por</div>
+              <div class="firma-nombre">Rafael Carrizo</div>
+              <div class="firma-rol">Técnico en Higiene y Seguridad Laboral<br>Matrícula profesional vigente</div>
+            </div>
+          </div>
+        </div>
+        <div class="warn">Para guardarlo como PDF: al imprimir, elegí "Guardar como PDF" en el destino de la impresora.</div>
+      `;
+      printBtn.hidden = false;
+    }
+
+    boot();
+  </script>
+</body>
+</html>

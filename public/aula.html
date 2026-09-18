@@ -216,7 +216,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
       <div class="t" id="diplomaTitle">Diploma bloqueado</div>
       <div class="d" id="diplomaText">Se habilita al completar los 10 módulos + evaluación final. Figura con tu nombre, apellido y DNI tal como los registraste.</div>
-      <a class="navbtn primary" id="diplomaDownload" href="#" hidden style="margin-top:10px;display:inline-block;font-size:.78rem;padding:8px 12px;">Descargar contenido (PDF)</a>
+      <a class="navbtn primary" id="diplomaDownload" href="#" hidden style="margin-top:10px;display:inline-block;font-size:.78rem;padding:8px 12px;">Ver / imprimir diploma</a>
     </div>
   </aside>
 
@@ -420,11 +420,11 @@
     if(doneCount === total){
       diplomaTitle.textContent = '¡Curso completado!';
       diplomaText.textContent = `Completaste los 10 módulos de "${data.title}". Tu diploma queda registrado a tu nombre y DNI.`;
-      if(data.pdf){
-        diplomaDownload.hidden = false;
-        diplomaDownload.href = data.pdf;
-        diplomaDownload.setAttribute('download', '');
-      }
+      diplomaDownload.hidden = false;
+      diplomaDownload.href = 'diploma.html?c=' + encodeURIComponent(slug);
+      diplomaDownload.removeAttribute('download');
+      diplomaDownload.removeAttribute('target');
+      diplomaDownload.textContent = 'Ver / imprimir diploma';
     } else {
       diplomaTitle.textContent = 'Diploma bloqueado';
       diplomaText.textContent = `Se habilita al completar los 10 módulos + evaluación final de "${data.title}". Figura con tu nombre, apellido y DNI tal como los registraste.`;
