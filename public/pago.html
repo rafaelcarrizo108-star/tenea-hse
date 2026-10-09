@@ -101,11 +101,12 @@
     <p class="kicker">Reservá tu lugar</p>
     <h1 class="h">Transferí para confirmar</h1>
     <p class="course-name" id="courseName">Cargando curso…</p>
+    <div id="comboBox" hidden style="margin:0 0 18px;"></div>
 
     <div class="receipt">
       <div class="receipt-head">
         <div class="amt-label">Monto a transferir</div>
-        <div class="amt">$50.000<span>ARS</span></div>
+        <div class="amt"><span id="amtVal" style="font-size:inherit;color:inherit;margin:0;">$50.000</span><span>ARS</span></div>
       </div>
       <div class="receipt-body">
         <div class="alias-row">
@@ -118,7 +119,7 @@
         </div>
 
         <ol class="steps">
-          <li><span class="n">1</span><span>Transferí <b>$50.000 ARS</b> al alias <b>Kelo.20</b> desde tu banco o Mercado Pago.</span></li>
+          <li><span class="n">1</span><span>Transferí <b id="amtStep">$50.000 ARS</b> al alias <b>Kelo.20</b> desde tu banco o Mercado Pago.</span></li>
           <li><span class="n">2</span><span>Sacale una captura al comprobante.</span></li>
           <li><span class="n">3</span><span>Creá tu cuenta y mandanos el comprobante — habilitamos tu acceso en cuanto lo confirmamos.</span></li>
         </ol>
@@ -133,6 +134,7 @@
   </div>
 </div>
 
+<script src="catalog.js"></script>
 <script>
   const TITLES = {
     cero:"Seguridad en Oil & Gas desde Cero",
@@ -151,7 +153,42 @@
   const courseNameEl = document.getElementById('courseName');
   const createBtn = document.getElementById('createAccountBtn');
 
-  if(slug && TITLES[slug]){
+  (window.TENEA_NEW_COURSES || []).forEach(c => { TITLES[c.slug] = c.title; });
+  const params = new URLSearchParams(location.search);
+  const comboId = params.get('combo');
+  const combo = (window.TENEA_COMBOS || []).find(c => c.id === comboId);
+  const amtVal = document.getElementById('amtVal');
+  const amtStep = document.getElementById('amtStep');
+  const comboBox = document.getElementById('comboBox');
+
+  if(combo){
+    amtVal.textContent = tenFmt(combo.price);
+    amtStep.textContent = tenFmt(combo.price) + ' ARS';
+    courseNameEl.textContent = 'Combo ' + combo.n + ' — ' + combo.title;
+    comboBox.hidden = false;
+    const head = `<div style="font-size:.9rem;margin-bottom:10px;"><s style="opacity:.6">${tenFmt(combo.old)}</s> &nbsp;<b>${tenFmt(combo.price)}</b> &nbsp;· Ahorrás ${tenFmt(combo.save)} · ${combo.note}</div>`;
+    if(combo.courses.length){
+      comboBox.innerHTML = head + '<ul style="margin:0;padding-left:1.1em;line-height:1.7;">' + combo.courses.map(c => `<li>${TITLES[c] || c}</li>`).join('') + '</ul>';
+      createBtn.setAttribute('href', 'login.html?c=' + encodeURIComponent(combo.courses[0]) + '&cs=' + combo.courses.join(','));
+    } else {
+      comboBox.innerHTML = head + `<div style="margin-bottom:8px;">Elegí exactamente <b>${combo.pick}</b> cursos:</div><div id="pickList" style="display:grid;gap:6px;max-height:300px;overflow:auto;padding:4px;"></div><div id="pickCount" class="mono" style="margin-top:8px;font-size:.8rem;"></div>`;
+      const list = document.getElementById('pickList');
+      list.innerHTML = (window.TENEA_NEW_COURSES || []).map(c => `<label style="display:flex;gap:8px;align-items:center;cursor:pointer;"><input type="checkbox" value="${c.slug}"> ${c.title}</label>`).join('');
+      const refresh = () => {
+        const sel = [...list.querySelectorAll('input:checked')].map(i => i.value);
+        list.querySelectorAll('input:not(:checked)').forEach(i => { i.disabled = sel.length >= combo.pick; });
+        document.getElementById('pickCount').textContent = sel.length + ' de ' + combo.pick + ' elegidos';
+        if(sel.length === combo.pick){
+          createBtn.removeAttribute('aria-disabled'); createBtn.style.opacity = ''; createBtn.style.pointerEvents = '';
+          createBtn.setAttribute('href', 'login.html?c=' + encodeURIComponent(sel[0]) + '&cs=' + sel.join(','));
+        } else {
+          createBtn.setAttribute('aria-disabled', 'true'); createBtn.style.opacity = '.45'; createBtn.style.pointerEvents = 'none';
+          createBtn.setAttribute('href', 'login.html');
+        }
+      };
+      list.addEventListener('change', refresh); refresh();
+    }
+  } else if(slug && TITLES[slug]){
     courseNameEl.textContent = TITLES[slug];
     createBtn.setAttribute('href', 'login.html?c=' + encodeURIComponent(slug));
   } else {

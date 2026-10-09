@@ -32,6 +32,29 @@ function wrap(fn) {
   return (req, res, next) => fn(req, res, next).catch(next);
 }
 
+
+// Inscribe al usuario (sin habilitar) en uno o varios cursos. Se usa para combos.
+async function enrollMany(userId, list) {
+  const slugs = [...new Set((Array.isArray(list) ? list : []).filter(isValidCourse))].slice(0, 6);
+  for (const slug of slugs) {
+    const [enr] = await sql`
+      INSERT INTO enrollments (user_id, course_slug, enabled)
+      VALUES (${userId}, ${slug}, FALSE)
+      ON CONFLICT (user_id, course_slug) DO NOTHING
+      RETURNING id
+    `;
+    if (enr) {
+      for (let i = 0; i < MODULES_PER_COURSE; i++) {
+        await sql`
+          INSERT INTO progress (enrollment_id, module_index)
+          VALUES (${enr.id}, ${i})
+          ON CONFLICT (enrollment_id, module_index) DO NOTHING
+        `;
+      }
+    }
+  }
+}
+
 // ---------- API ----------
 
 app.post("/api/register", wrap(async (req, res) => {
@@ -84,6 +107,7 @@ app.post("/api/register", wrap(async (req, res) => {
       enrollment = enr;
     }
   }
+  await enrollMany(user.id, body.courses);
 
   const cookie = setSessionCookie({ uid: user.id, role: "student", email: user.email });
   res.set("set-cookie", cookie);
@@ -128,6 +152,7 @@ app.post("/api/login", wrap(async (req, res) => {
       enrollment = existingEnr || null;
     }
   }
+  await enrollMany(user.id, body.courses);
 
   const cookie = setSessionCookie({ uid: user.id, role: "student", email: user.email });
   res.set("set-cookie", cookie);

@@ -185,6 +185,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="catalog.js"></script>
 <script>
   const COURSE_NAMES = {
     cero:"Seguridad en Oil & Gas desde Cero", ptw:"Permiso de Trabajo (PTW) para Oil & Gas",
@@ -193,6 +194,13 @@
     izaje:"Izaje y Operaciones con Grúas en Oil & Gas", quimicas:"Seguridad con Sustancias Químicas en Oil & Gas",
     riesgos:"Análisis de Riesgos — AST, JSA y ART", emergencias:"Respuesta ante Emergencias en Instalaciones Petroleras"
   };
+
+  (window.TENEA_NEW_COURSES || []).forEach(c => {
+    COURSE_NAMES[c.slug] = c.title;
+    const b = document.createElement('button');
+    b.dataset.course = c.slug; b.textContent = c.title.replace(/\s*\(.*\)$/, '');
+    document.getElementById('filters').appendChild(b);
+  });
 
   const rowsEl = document.getElementById('rows');
   let students = [];

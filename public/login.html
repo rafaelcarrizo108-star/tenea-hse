@@ -126,6 +126,8 @@
 <script>
   // Preserva el curso elegido en el catálogo (?c=slug) para inscribir al alumno en ese curso.
   const courseParam = new URLSearchParams(location.search).get('c');
+  // Combos: ?cs=a,b,c inscribe al alumno en todos los cursos del combo (se habilitan al confirmar el pago).
+  const comboCourses = (new URLSearchParams(location.search).get('cs') || '').split(',').map(x => x.trim()).filter(Boolean);
   const suffix = courseParam ? ('?c=' + encodeURIComponent(courseParam)) : '';
 
   async function submitAuth(url, payload, btn, errorEl){
@@ -161,6 +163,7 @@
       email: document.getElementById('li-email').value,
       password: document.getElementById('li-pass').value,
       course: courseParam || undefined,
+      courses: comboCourses.length ? comboCourses : undefined,
     }, document.getElementById('loginGo'), document.getElementById('loginError'));
   });
 
@@ -173,6 +176,7 @@
       email: document.getElementById('re-email').value,
       password: document.getElementById('re-pass').value,
       course: courseParam || undefined,
+      courses: comboCourses.length ? comboCourses : undefined,
     }, document.getElementById('registerGo'), document.getElementById('registerError'));
   });
 

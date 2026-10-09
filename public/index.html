@@ -220,7 +220,7 @@
           <div class="ph"><span>TENEA · Nº 2026-004</span><span>Permiso de acceso</span></div>
           <h3>Curso habilitado</h3>
           <div class="row"><span>Alumno</span><b>Rafael C.</b></div>
-          <div class="row"><span>Catálogo</span><b>10 cursos HSE</b></div>
+          <div class="row"><span>Catálogo</span><b>30 cursos</b></div>
           <div class="row"><span>Válido</span><b>Acceso permanente</b></div>
           <div class="row"><span>Autoriza</span><b>TENEA</b></div>
         </div>
@@ -239,7 +239,7 @@
   <section class="catalog" id="cursos">
     <div class="wrap">
       <p class="tag"><i></i>Catálogo</p>
-      <h2 style="margin-top:16px;">10 cursos, cada uno completo.</h2>
+      <h2 style="margin-top:16px;">10 cursos de seguridad, cada uno completo.</h2>
       <p class="lead">Cada curso de TENEA está escrito de punta a punta: 10 módulos con actividades, evaluación de 10 preguntas con tiempo límite y diploma al finalizar. Elegí el que necesitás.</p>
       <div class="cat-grid">
 
@@ -417,12 +417,30 @@
     </div>
   </section>
 
+  <section class="catalog" id="combos" hidden>
+    <div class="wrap">
+      <p class="tag"><i></i>Combos</p>
+      <h2 style="margin-top:16px;">Combos para formarte más y pagar menos.</h2>
+      <p class="lead">Armamos recorridos de especialización con precio especial. Cada curso incluido mantiene sus 10 módulos, evaluaciones y diploma.</p>
+      <div class="cat-grid" id="comboGrid"></div>
+    </div>
+  </section>
+
+  <section class="catalog" id="especializacion" hidden>
+    <div class="wrap">
+      <p class="tag"><i></i>Especialización Oil &amp; Gas</p>
+      <h2 style="margin-top:16px;">20 especialidades de campo, con manual en PDF.</h2>
+      <p class="lead">Wireline, slickline, coiled tubing, fractura, completación, well control y más. Cada curso incluye 10 módulos con evaluación de 10 preguntas, diploma y el manual técnico en PDF al aprobar. Material formativo: no habilita a operar equipos.</p>
+      <div class="cat-grid" id="espGrid"></div>
+    </div>
+  </section>
+
   <section class="how" id="como-funciona">
     <div class="wrap">
       <p class="tag"><i></i>Cómo funciona</p>
       <h2 style="margin-top:16px;">De la inscripción al diploma.</h2>
       <div class="steps">
-        <div><span class="n">01</span><div class="t">Elegís tu curso</div><div class="d">10 cursos HSE disponibles, cada uno con su propio programa.</div></div>
+        <div><span class="n">01</span><div class="t">Elegís tu curso</div><div class="d">30 cursos disponibles, cada uno con su propio programa.</div></div>
         <div><span class="n">02</span><div class="t">Pagás una vez</div><div class="d">Sin mensualidades, acceso permanente al portal del alumno.</div></div>
         <div><span class="n">03</span><div class="t">Avanzás módulo a módulo</div><div class="d">Contenido, actividad y mini evaluación en cada uno.</div></div>
         <div><span class="n">04</span><div class="t">Rendís y te llevás el diploma</div><div class="d">Evaluación final integradora y certificado descargable.</div></div>
@@ -469,5 +487,21 @@
     </div>
   </div>
 </footer>
+<script src="catalog.js"></script>
+<script>
+(function(){
+  var esc=function(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  var courses=window.TENEA_NEW_COURSES||[], combos=window.TENEA_COMBOS||[];
+  if(!courses.length) return;
+  var byslug={}; courses.forEach(function(c){byslug[c.slug]=c;});
+  var btn='class="btn btn-accent btn-pulse" style="font-size:.82rem;padding:.75em 1.3em;"';
+  document.getElementById('espGrid').innerHTML=courses.map(function(c){return '<div class="course"><div class="punch"></div><div class="top"><div class="kicker"><span class="badge">'+esc(c.badge)+'</span><span>'+esc(c.code)+'</span></div><h3>'+esc(c.title)+'</h3><p class="desc">'+esc(c.desc)+'</p></div><div class="mid" style="grid-template-columns:1fr 1fr;"><div><b>10</b><span>MÓDULOS</span></div><div><b>10</b><span>EVALUACIONES</span></div></div><div class="bottom"><div class="price">'+tenFmt(window.TENEA_PRICE)+'<small>ARS · pago único</small></div><a '+btn+' href="pago.html?c='+c.slug+'">Comprar</a></div></div>';}).join('');
+  document.getElementById('comboGrid').innerHTML=combos.map(function(k){
+    var inc=k.courses.length?k.courses.map(function(s){return esc((byslug[s]||{}).title||s);}).join(' + '):'Cinco cursos a elección de las 20 especialidades.';
+    return '<div class="course"><div class="punch"></div><div class="top"><div class="kicker"><span class="badge">Combo '+k.n+'</span><span>Ahorrás '+tenFmt(k.save)+'</span></div><h3>'+esc(k.title)+'</h3><p class="desc">'+inc+'</p><p class="desc" style="margin-top:6px;">'+esc(k.note)+'</p></div><div class="bottom"><div class="price"><s style="font-size:.6em;opacity:.55;font-weight:500;">'+tenFmt(k.old)+'</s><br>'+tenFmt(k.price)+'<small>ARS · pago único</small></div><a '+btn+' href="pago.html?combo='+k.id+'">Comprar combo</a></div></div>';}).join('');
+  document.getElementById('combos').hidden=false;
+  document.getElementById('especializacion').hidden=false;
+})();
+</script>
 </body>
 </html>
