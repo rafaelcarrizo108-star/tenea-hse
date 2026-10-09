@@ -328,7 +328,6 @@
     const c = COURSES[key];
     const cc = COURSE_CONTENT[key];
     if (!cc || c.content) return;
-    c.pdf = '/api/material?course=' + encodeURIComponent(key);
     c.content = c.modules.map((title, i) => {
       if (i < cc.modules.length) {
         const m = cc.modules[i];
@@ -340,7 +339,7 @@
       }
       return {
         kind: 'final', law: cc.law, desc: cc.final.desc, bank: cc.finalBank,
-        checklist: ['Repasá los puntos clave de los 8 módulos.', 'Releé el caso de la actividad integradora.', 'Tenés 10 minutos y necesitás 6/10 para aprobar.', 'Al aprobar se habilitan el diploma y el material teórico en PDF.'],
+        checklist: ['Repasá los puntos clave de los 8 módulos.', 'Releé el caso de la actividad integradora.', 'Tenés 10 minutos y necesitás 6/10 para aprobar.', 'Al aprobar se habilita tu diploma.'],
       };
     });
   }
@@ -411,7 +410,7 @@
     if(curDone && isLastModule){
       nextBtn.textContent = '✓ Curso completado';
       nextBtn.disabled = true;
-      nextHint.textContent = '¡Completaste los 10 módulos! Ya podés descargar el material del curso.';
+      nextHint.textContent = '¡Completaste los 10 módulos! Ya podés ver tu diploma.';
       nextHint.classList.add('ok');
     } else if(curDone && hasNextContent){
       nextBtn.textContent = `Módulo ${String(nextIndex+1).padStart(2,'0')} · ${data.modules[nextIndex]} →`;
@@ -486,7 +485,7 @@
       html += `<p class="legal">Resolvé el caso con lo visto en los módulos 1 a 8 y después rendí la evaluación integradora de 10 preguntas (pestaña Evaluación).</p>`;
     } else {
       html += `<p>${esc(mod.desc)}</p>`;
-      html += `<div class="cblock"><div class="obj">Al aprobar</div><p>Se habilita tu diploma y la descarga del material teórico completo del curso en PDF.</p></div>`;
+      html += `<div class="cblock"><div class="obj">Al aprobar</div><p>Se habilita tu diploma.</p></div>`;
     }
     document.getElementById('contentBody').innerHTML = html;
     document.getElementById('checklistEl').innerHTML = mod.checklist.map((c) => `<li><input type="checkbox" disabled> ${esc(c)}</li>`).join('');
@@ -692,7 +691,7 @@
         ? `Aprobado · ${correctCount}/${TOTAL_Q}`
         : `No alcanzaste el mínimo · ${correctCount}/${TOTAL_Q}`;
       resultDetail.textContent = passed
-        ? (MODULE_INDEX === data.modules.length - 1 ? '¡Aprobaste el curso! Ya podés descargar el material teórico en PDF desde la barra lateral.' : 'Superaste el mínimo de 6/10. Quedó guardado en tu progreso real.')
+        ? (MODULE_INDEX === data.modules.length - 1 ? '¡Aprobaste el curso! Ya podés ver tu diploma desde la barra lateral.' : 'Superaste el mínimo de 6/10. Quedó guardado en tu progreso real.')
         : (withinTime
             ? `Necesitás al menos 6/${TOTAL_Q} para avanzar de módulo. Tenés intentos ilimitados: volvé a rendirla cuando quieras.`
             : 'Se venció el tiempo de 10 minutos antes de enviar la respuesta, así que no cuenta. Volvé a intentarlo.');
