@@ -174,6 +174,21 @@
   .lectura h4{margin:0 0 6px;font-size:.98rem;}
   .lectura h4 .mono{color:var(--accent);font-size:.75rem;margin-right:4px;}
   .lectura p{margin:0;color:var(--ink-soft);line-height:1.65;font-size:.92rem;}
+  /* fix: el atributo hidden debe ganarle a cualquier display de clase/inline */
+  [hidden]{display:none !important;}
+  .backlink{white-space:nowrap;}
+  .pane-foot .navbtn{justify-content:center;}
+  @media (max-width:640px){
+    .topbar-inner{flex-wrap:wrap;gap:8px 12px;padding:10px 16px;}
+    .brand{font-size:1.1rem;}
+    .backlink{font-size:.74rem;}
+    .who{margin-left:auto;gap:8px;}
+    .who .name{display:none;}
+    .pane-foot{flex-direction:column;align-items:stretch;padding:16px;}
+    .pane-foot > a.navbtn,.pane-foot .navbtn{width:100%;}
+    .pane-foot > div{text-align:left !important;}
+    .next-hint{font-size:.72rem;}
+  }
 </style>
 </head>
 <body>
@@ -327,7 +342,8 @@
   function buildContent(key) {
     const c = COURSES[key];
     const cc = COURSE_CONTENT[key];
-    if (!cc || c.content) return;
+    if (!cc || c._built) return;
+    c._built = true;
     c.content = c.modules.map((title, i) => {
       if (i < cc.modules.length) {
         const m = cc.modules[i];
@@ -429,6 +445,8 @@
       nextHint.classList.remove('ok');
     }
 
+    nextBtn.hidden = (nextBtn.textContent.trim() === '—' || nextBtn.textContent.trim() === '');
+
     // Diploma / descarga de contenido: se habilitan al completar el curso.
     const diplomaTitle = document.getElementById('diplomaTitle');
     const diplomaText = document.getElementById('diplomaText');
@@ -469,15 +487,18 @@
       return;
     }
 
-    document.getElementById('lawrow').innerHTML = mod.law.map(l => `<span>${esc(l)}</span>`).join('');
+    document.getElementById('lawrow').innerHTML = (mod.law || []).map(l => `<span>${esc(l)}</span>`).join('');
     let html = '';
+    if (!mod.kind) { mod.kind = (mod.p1 || mod.p2) ? 'legacy' : 'std'; }
     if (mod.kind === 'std') {
       if (mod.legal) html += `<p class="legal">${esc(mod.legal)}</p>`;
-      html += mod.blocks.map((b, bi) => `<div class="cblock"><div class="obj">Concepto clave ${bi+1}</div><p>${esc(b)}</p></div>`).join('');
-      if (mod.lectura.length) {
+      html += (mod.blocks || []).map((b, bi) => `<div class="cblock"><div class="obj">Concepto clave ${bi+1}</div><p>${esc(b)}</p></div>`).join('');
+      if ((mod.lectura || []).length) {
         html += `<div class="lectura"><h3>Lectura del módulo</h3>` + mod.lectura.map((sec, si) =>
           `<article><h4><span class="mono">${idx+1}.${si+1}</span>${esc(sec.h)}</h4><p>${esc(sec.p)}</p></article>`).join('') + `</div>`;
       }
+    } else if (mod.kind === 'legacy') {
+      html += [mod.p1, mod.p2].filter(Boolean).map(t => `<p>${esc(t)}</p>`).join('');
     } else if (mod.kind === 'int') {
       html += `<p>${esc(mod.ig.intro)}</p>`;
       html += `<div class="cblock"><div class="obj">Caso</div><p>${esc(mod.ig.case)}</p></div>`;
@@ -488,9 +509,9 @@
       html += `<div class="cblock"><div class="obj">Al aprobar</div><p>Se habilita tu diploma.</p></div>`;
     }
     document.getElementById('contentBody').innerHTML = html;
-    document.getElementById('checklistEl').innerHTML = mod.checklist.map((c) => `<li><input type="checkbox" disabled> ${esc(c)}</li>`).join('');
+    document.getElementById('checklistEl').innerHTML = (mod.checklist || []).map((c) => `<li><input type="checkbox" disabled> ${esc(c)}</li>`).join('');
 
-    document.getElementById('quizBarK').textContent = `Evaluación · Módulo ${String(idx+1).padStart(2,'0')} · ${mod.bank.length} preguntas`;
+    document.getElementById('quizBarK').textContent = `Evaluación · Módulo ${String(idx+1).padStart(2,'0')} · ${(mod.bank || []).length} preguntas`;
     document.getElementById('quizQuestion').textContent = '';
     document.getElementById('quizOptions').innerHTML = '';
     document.getElementById('quizProgress').textContent = '';
